@@ -1,0 +1,8 @@
+{
+    "landingPage": "/wp-admin/post-new.php?post_type=managed_content",
+    "plugins": [
+        "gutenberg"
+    ],
+    "login": true,
+    "steps": []
+}

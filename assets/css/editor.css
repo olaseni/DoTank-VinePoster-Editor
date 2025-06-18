@@ -1,0 +1,26 @@
+.content-manager-panel .authors-section {
+    margin-bottom: 16px;
+}
+
+.content-manager-panel .author-item {
+    padding: 8px;
+    background: #f0f0f0;
+    margin: 4px 0;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.author-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 100000;
+}
+
+/* Match your prototype styling */
+.edit-post-sidebar .content-manager-panel {
+    border: 1px solid #ddd;
+}
