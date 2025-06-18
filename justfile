@@ -13,8 +13,11 @@ install: clean
 start:
     npx @wp-now/wp-now start --blueprint=./blueprint.json
 
-test-remote-blueprint:
+blueprint-local:
     open index.html
+
+blueprint-remote:
+    open https://olaseni.github.io/dotank-resources/DoTank-VinePoster-Editor/
 
 git-push:
     git push
