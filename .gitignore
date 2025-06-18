@@ -1,2 +1,9 @@
 node_modules/
 update-parent-repo.sh
+src-wordpress
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.orig
