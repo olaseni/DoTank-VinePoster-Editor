@@ -140,21 +140,14 @@ class ContentManager
         wp_enqueue_script(
             'content-manager-editor',
             plugin_dir_url(__FILE__) . 'build/editor.js',
-            [
-                'wp-blocks',
-                'wp-edit-post',
-                'wp-element',
-                'wp-components',
-                'wp-data',
-                'wp-plugins',
-                'wp-api-fetch'
-            ],
-            '1.0.0'
+            ['wp-blocks', 'wp-edit-post', 'wp-element', 'wp-components'],
+            '1.0.0',
+            true
         );
 
         wp_enqueue_style(
             'content-manager-editor',
-            plugin_dir_url(__FILE__) . 'build/editor.css',
+            plugin_dir_url(__FILE__) . 'assets/css/editor.css',
             [],
             '1.0.0'
         );
