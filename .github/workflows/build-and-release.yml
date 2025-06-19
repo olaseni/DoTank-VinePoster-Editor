@@ -2,17 +2,10 @@ name: Build and Deploy Plugin
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      tag_name:
-        description: 'Tag name for deployment'
-        required: true
-        default: 'v1.0.0'
-      
-permissions:
-  contents: read
+
 
 jobs:
   build-and-deploy:
@@ -49,14 +42,6 @@ jobs:
           zip -r ../plugin.zip . -x "*.DS_Store" "node_modules/*" "*.log"
           cd ..
           
-      - name: Get tag name
-        id: get_tag
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag_name=${{ github.event.inputs.tag_name }}" >> $GITHUB_OUTPUT
-          else
-            echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          fi
           
       - name: Setup SSH
         run: |
