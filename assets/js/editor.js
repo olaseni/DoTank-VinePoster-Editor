@@ -5,11 +5,11 @@ import { useEffect } from 'react';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
-const HideElements = () => {
+const HideElements = ({ targetStyle }) => {
     useEffect(() => {
         const style = document.createElement('style');
         style.textContent = `
-            .editor-post-panel__section.editor-post-summary {
+             ${targetStyle} {
                 display: none !important;
             }
         `;
@@ -20,7 +20,6 @@ const HideElements = () => {
     }, []);
     return null;
 };
-registerPlugin('hide-elements', { render: HideElements });
 
 const PluginPostStatusInfoTest = () => (
     <PluginPostStatusInfo>
@@ -28,7 +27,11 @@ const PluginPostStatusInfoTest = () => (
     </PluginPostStatusInfo>
 );
 
-registerPlugin('post-status-info-test', { render: PluginPostStatusInfoTest });
+// registerPlugin('post-status-info-test', { render: PluginPostStatusInfoTest });
+
+['.editor-post-panel__section.editor-post-summary', '.editor-document-tools__inserter-toggle'].forEach((targetStyle, index) => {
+    registerPlugin(`hidden-control-${index}`, { render: () => <HideElements targetStyle={targetStyle} /> });
+});
 
 const ContentSettingsPanel = () => {
     const [authorModal, setAuthorModal] = useState(false);
