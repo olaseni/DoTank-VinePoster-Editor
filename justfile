@@ -1,17 +1,43 @@
-
 default:
     @echo  "Usage: just <target>"
     @just --list
 
 clean:
     npm cache clean --force &> /dev/null
-    rm -rf node_modules package-lock.json
+    rm -rf node_modules package-lock.json build
+    rm -fr ~/.wp-now
 
 install: clean
     npm install
 
+build:
+    npm run build
+
+build-dev:
+    npm run start
+
 start:
     npx @wp-now/wp-now start --blueprint=./blueprint.json
+
+clean-start: clean start
+
+start-with-build:
+    @# Attempt to stop existing services
+    just stop || true
+    @# Make a pid dir if none exists
+    mkdir -p ./pid ./logs
+    @# Start the processes in the background and save their PIDs
+    { just start > ./logs/start.log 2>&1 & echo $$! > ./pid/start; }
+    { just build-dev > ./logs/build-dev.log 2>&1 & echo $$! > ./pid/build-dev; }
+    @echo "Services started. View logs in ./logs/ directory. Use 'just stop' to terminate."
+
+stop:
+    @if [ ! -d "./pid" ]; then exit 0; fi
+    @find ./pid -type f -exec sh -c 'pid=$(cat "{}") && \
+        if ps -p $$pid > /dev/null 2>&1; then \
+                    kill $$pid > /dev/null 2>&1 || echo "Error: Failed to kill process $$pid"; \
+        fi' \;
+    @rm -f ./pid/* > /dev/null 2>&1
 
 blueprint-local:
     open index.html
@@ -23,4 +49,3 @@ git-push:
     git push
     @# Needed because we are using a submodule in Github Pages enabled repo, and that repo needs to be updated
     ./update-parent-repo.sh
- 

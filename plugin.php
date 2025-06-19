@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name: CM
+ * Plugin Name: Vine Poster Editor
  * Description: Custom content management system with Gutenberg integration
  * Version: 1.0.0
  */
@@ -47,20 +47,14 @@ class ContentManager
                 ['core/paragraph', [
                     'placeholder' => 'A short description'
                 ]],
-                ['core/columns', [
-                    'template' => [
-                        ['core/column', [
-                            'template' => [
-                                ['core/paragraph', ['placeholder' => 'This content fits in a column']]
-                            ]
-                        ]],
-                        ['core/column', [
-                            'template' => [
-                                ['core/paragraph', ['placeholder' => 'This content fits in a column']]
-                            ]
-                        ]]
+                [
+                    'core/columns',
+                    [],
+                    [
+                        ['core/column', [], [['core/paragraph', ['placeholder' => 'This content fits in a column 1']]]],
+                        ['core/column', [], [['core/paragraph', ['placeholder' => 'This content fits in a column 2']]]],
                     ]
-                ]],
+                ],
                 ['core/image', ['placeholder' => 'Featured Image']],
             ],
             'template_lock' => 'insert',

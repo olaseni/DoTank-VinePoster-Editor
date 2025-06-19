@@ -4,5 +4,16 @@
         "gutenberg"
     ],
     "login": true,
-    "steps": []
+    "steps": [
+        {
+            "step": "define-before-run",
+            "constants": {
+                "SOME_CONSTANT": "some-value"
+            }
+        }
+    ],
+    "constants": {
+        "WP_DEBUG": "true",
+        "WP_DEBUG_LOG": "true"
+    }
 }
