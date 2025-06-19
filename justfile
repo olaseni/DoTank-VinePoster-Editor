@@ -17,13 +17,15 @@ build-dev:
     npm run start
 
 start:
-    npx @wp-now/wp-now start --blueprint=./blueprint.json
+    npx @wp-now/wp-now start --port 8881 --blueprint=./blueprint.json
 
 clean-start: install build start
 
 start-and-watch:
     @# Attempt to stop existing services
     just stop || true
+    pgrep -f '[j]ust (start|build-dev|start-and-watch)' | xargs kill -9 || true
+    lsof -ti :8881 | xargs kill -9 || true
     @# build
     just build
     @# Make a pid dir if none exists
