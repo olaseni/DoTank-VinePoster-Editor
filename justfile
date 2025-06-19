@@ -32,12 +32,17 @@ start-with-build:
     @echo "Services started. View logs with 'just logs'. Use 'just stop' to terminate."
 
 logs:
-    @if [ ! -d "./logs" ]; then exit 0; fi
-    @echo "Viewing logs (Ctrl+C to exit)"
-    @if command -v multitail > /dev/null; then \
-        multitail -c -ts "./logs/start.log" -c -ts "./logs/build-dev.log"; \
-    else \
-        tail -f ./logs/start.log ./logs/build-dev.log; \
+    #!/usr/bin/env bash
+    set -euo pipefail
+    test -d logs || { echo "No logs directory found"; exit 1; }
+    if ! find logs -maxdepth 1 -type f | grep -q .; then
+        { echo "No logs found"; exit 1; }
+    fi    
+    echo "Viewing logs (Ctrl+C to exit)"
+    if command -v multitail > /dev/null; then
+        multitail -c -ts logs/*
+    else
+        tail -f logs/*
     fi
 
 clear-logs:
