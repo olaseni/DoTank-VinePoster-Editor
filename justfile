@@ -29,7 +29,19 @@ start-with-build:
     @# Start the processes in the background and save their PIDs
     { just start > ./logs/start.log 2>&1 & echo $$! > ./pid/start; }
     { just build-dev > ./logs/build-dev.log 2>&1 & echo $$! > ./pid/build-dev; }
-    @echo "Services started. View logs in ./logs/ directory. Use 'just stop' to terminate."
+    @echo "Services started. View logs with 'just logs'. Use 'just stop' to terminate."
+
+logs:
+    @if [ ! -d "./logs" ]; then exit 0; fi
+    @echo "Viewing logs (Ctrl+C to exit)"
+    @if command -v multitail > /dev/null; then \
+        multitail -c -ts "./logs/start.log" -c -ts "./logs/build-dev.log"; \
+    else \
+        tail -f ./logs/start.log ./logs/build-dev.log; \
+    fi
+
+clear-logs:
+    @rm -f ./logs/* > /dev/null 2>&1
 
 stop:
     @if [ ! -d "./pid" ]; then exit 0; fi
