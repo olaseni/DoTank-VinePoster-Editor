@@ -24,8 +24,6 @@ clean-start: install build start
 start-and-watch:
     @# Attempt to stop existing services
     just stop || true
-    pgrep -f '[j]ust (start|build-dev|start-and-watch)' | xargs kill -9 || true
-    lsof -ti :8881 | xargs kill -9 || true
     @# build
     just build
     @# Make a pid dir if none exists
@@ -52,13 +50,21 @@ logs:
 clear-logs:
     @rm -f ./logs/* > /dev/null 2>&1
 
-stop:
+stop-by-pid:
     @if [ ! -d "./pid" ]; then exit 0; fi
     @find ./pid -type f -exec sh -c 'pid=$(cat "{}") && \
         if ps -p $$pid > /dev/null 2>&1; then \
                     kill $$pid > /dev/null 2>&1 || echo "Error: Failed to kill process $$pid"; \
         fi' \;
     @rm -f ./pid/* > /dev/null 2>&1
+
+stop-by-port-and-process-id:
+    @pgrep -f '[j]ust (start|build-dev|start-and-watch)' | xargs kill -9 || true
+    @lsof -ti :8881 | xargs kill -9 || true
+
+stop:
+    @just stop-by-port-and-process-id || true
+    @just stop-by-pid || true
 
 blueprint-local:
     open index.html
