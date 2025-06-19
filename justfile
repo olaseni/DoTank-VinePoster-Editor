@@ -70,7 +70,7 @@ blueprint-local:
     open index.html
 
 blueprint-remote:
-    open https://olaseni.github.io/dotank-resources/DoTank-VinePoster-Editor/
+    open https://333608b5aa.nxcli.io/vine-poster-editor/
 
 git-push:
     git push

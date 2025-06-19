@@ -1,4 +1,4 @@
-name: Build and Release Plugin
+name: Build and Deploy Plugin
 
 on:
   push:
@@ -7,15 +7,15 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Tag name for the release'
+        description: 'Tag name for deployment'
         required: true
         default: 'v1.0.0'
       
 permissions:
-  contents: write  # required to create release/upload files
+  contents: read
 
 jobs:
-  build-and-release:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
@@ -46,53 +46,33 @@ jobs:
       - name: Create plugin zip
         run: |
           cd vine-poster-plugin
-          zip -r ../vine-poster-plugin.zip . -x "*.DS_Store" "node_modules/*" "*.log"
+          zip -r ../plugin.zip . -x "*.DS_Store" "node_modules/*" "*.log"
           cd ..
           
-      - name: Get tag name and create tag if needed
+      - name: Get tag name
         id: get_tag
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TAG_NAME="${{ github.event.inputs.tag_name }}"
-            echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-            # Create tag if it doesn't exist (for manual runs)
-            if ! git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-              git config user.name "github-actions[bot]"
-              git config user.email "github-actions[bot]@users.noreply.github.com"
-              git tag "$TAG_NAME"
-              git push origin "$TAG_NAME"
-            fi
+            echo "tag_name=${{ github.event.inputs.tag_name }}" >> $GITHUB_OUTPUT
           else
             echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           fi
           
-      - name: Create GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup SSH
         run: |
-          TAG_NAME="${{ steps.get_tag.outputs.tag_name }}"
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
           
-          # Check if release already exists
-          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
-            echo "Release $TAG_NAME already exists, deleting it first"
-            gh release delete "$TAG_NAME" --yes
-          fi
+      - name: Deploy to Remote Server
+        run: |
+          # Copy plugin zip file
+          scp plugin.zip ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:public_html/vine-poster-editor/
           
-          # Create the release
-          gh release create "$TAG_NAME" \
-            --title "Vine Poster Plugin $TAG_NAME" \
-            --notes "## Vine Poster Editor Plugin Release
-
-          This release contains:
-          - \`vine-poster-plugin.zip\` - Complete WordPress plugin package  
-          - \`index.html\` - Standalone demo/playground file
-
-          ### Installation
-          1. Download \`vine-poster-plugin.zip\`
-          2. Upload to your WordPress site via Plugins > Add New > Upload Plugin
-          3. Activate the plugin
-
-          ### Demo
-          Access the standalone demo by downloading \`index.html\` or visiting the direct link from this repository." \
-            vine-poster-plugin.zip \
-            index.html
+          # Copy index.html file
+          scp index.html ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:public_html/vine-poster-editor/
+          
+          echo "Files deployed successfully to public_html/vine-poster-editor/"
+          echo "Plugin zip: https://${{ secrets.SSH_HOST }}/vine-poster-editor/plugin.zip"
+          echo "Demo page: https://${{ secrets.SSH_HOST }}/vine-poster-editor/index.html"
