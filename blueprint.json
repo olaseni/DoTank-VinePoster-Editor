@@ -6,7 +6,8 @@
     "login": true,
     "steps": [
         {
-            "step": "define-before-run",
+            "step": "defineWpConfigConsts",
+            "method": "define-before-run",
             "constants": {
                 "SOME_CONSTANT": "some-value"
             }

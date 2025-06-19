@@ -19,7 +19,7 @@ build-dev:
 start:
     npx @wp-now/wp-now start --blueprint=./blueprint.json
 
-clean-start: clean start
+clean-start: install build start
 
 start-with-build:
     @# Attempt to stop existing services
