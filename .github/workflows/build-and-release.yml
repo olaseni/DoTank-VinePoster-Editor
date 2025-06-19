@@ -49,11 +49,19 @@ jobs:
           zip -r ../vine-poster-plugin.zip . -x "*.DS_Store" "node_modules/*" "*.log"
           cd ..
           
-      - name: Get tag name
+      - name: Get tag name and create tag if needed
         id: get_tag
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag_name=${{ github.event.inputs.tag_name }}" >> $GITHUB_OUTPUT
+            TAG_NAME="${{ github.event.inputs.tag_name }}"
+            echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+            # Create tag if it doesn't exist (for manual runs)
+            if ! git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+              git config user.name "github-actions[bot]"
+              git config user.email "github-actions[bot]@users.noreply.github.com"
+              git tag "$TAG_NAME"
+              git push origin "$TAG_NAME"
+            fi
           else
             echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           fi
