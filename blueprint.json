@@ -9,7 +9,7 @@
             "step": "defineWpConfigConsts",
             "method": "define-before-run",
             "constants": {
-                "SOME_CONSTANT": "some-value"
+                "SOME_CONSTANT": "some-value-here"
             }
         }
     ],
