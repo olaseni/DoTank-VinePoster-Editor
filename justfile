@@ -21,9 +21,11 @@ start:
 
 clean-start: install build start
 
-start-with-build:
+start-and-watch:
     @# Attempt to stop existing services
     just stop || true
+    @# build
+    just build
     @# Make a pid dir if none exists
     mkdir -p ./pid ./logs
     @# Start the processes in the background and save their PIDs
