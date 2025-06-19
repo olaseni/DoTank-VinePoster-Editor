@@ -1,0 +1,101 @@
+name: Build and Release Plugin
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name for the release'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build plugin assets
+        run: npm run build
+        
+      - name: Create plugin directory
+        run: mkdir -p vine-poster-plugin
+        
+      - name: Copy plugin files to directory
+        run: |
+          cp plugin.php vine-poster-plugin/
+          cp -r build vine-poster-plugin/
+          cp -r assets vine-poster-plugin/
+          
+      - name: Create plugin zip
+        run: |
+          cd vine-poster-plugin
+          zip -r ../vine-poster-plugin.zip . -x "*.DS_Store" "node_modules/*" "*.log"
+          cd ..
+          
+      - name: Get tag name
+        id: get_tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag_name=${{ github.event.inputs.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_tag.outputs.tag_name }}
+          release_name: Vine Poster Plugin ${{ steps.get_tag.outputs.tag_name }}
+          body: |
+            ## Vine Poster Editor Plugin Release
+            
+            This release contains:
+            - `vine-poster-plugin.zip` - Complete WordPress plugin package
+            - `index.html` - Standalone demo/playground file
+            
+            ### Installation
+            1. Download `vine-poster-plugin.zip`
+            2. Upload to your WordPress site via Plugins > Add New > Upload Plugin
+            3. Activate the plugin
+            
+            ### Demo
+            Access the standalone demo by downloading `index.html` or visiting the direct link from this repository.
+          draft: false
+          prerelease: false
+          
+      - name: Upload Plugin ZIP
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./vine-poster-plugin.zip
+          asset_name: vine-poster-plugin.zip
+          asset_content_type: application/zip
+          
+      - name: Upload index.html
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./index.html
+          asset_name: index.html
+          asset_content_type: text/html
