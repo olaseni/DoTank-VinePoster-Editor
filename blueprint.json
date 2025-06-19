@@ -4,15 +4,7 @@
         "gutenberg"
     ],
     "login": true,
-    "steps": [
-        {
-            "step": "defineWpConfigConsts",
-            "method": "define-before-run",
-            "constants": {
-                "SOME_CONSTANT": "some-value-here"
-            }
-        }
-    ],
+    "steps": [],
     "constants": {
         "WP_DEBUG": "true",
         "WP_DEBUG_LOG": "true"
