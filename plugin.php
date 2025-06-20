@@ -27,6 +27,7 @@ class ContentManager
         add_action('save_post_managed_content', [$this, 'calculate_read_time'], 10, 3);
         add_action('template_redirect', [$this, 'frontend_editor_redirect']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_editor_assets']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_frontend_editor_assets']);
     }
 
     public function register_post_type()
@@ -181,12 +182,16 @@ class ContentManager
     public function enqueue_frontend_editor_assets()
     {
         if (isset($_GET['frontend-editor']) && $_GET['frontend-editor'] === '1') {
-            // Enqueue our simple frontend editor script
+            // Use the auto-generated asset file for dependencies
+            $asset_file = plugin_dir_path(__FILE__) . 'build/frontend-editor.asset.php';
+            $asset = file_exists($asset_file) ? include $asset_file : ['dependencies' => [], 'version' => '1.0.0'];
+            
+            // Enqueue our frontend editor script with auto-generated dependencies
             wp_enqueue_script(
                 'frontend-editor',
                 plugin_dir_url(__FILE__) . 'build/frontend-editor.js',
-                [],
-                '1.0.0',
+                $asset['dependencies'],
+                $asset['version'],
                 true
             );
 
@@ -194,8 +199,8 @@ class ContentManager
             wp_enqueue_style(
                 'frontend-editor',
                 plugin_dir_url(__FILE__) . 'assets/css/frontend-editor.css',
-                [],
-                '1.0.0'
+                ['wp-edit-post'],
+                $asset['version']
             );
 
             // Localize script with REST API data

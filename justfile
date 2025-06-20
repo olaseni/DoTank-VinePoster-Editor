@@ -17,7 +17,7 @@ build-dev:
     npm run start
 
 start: stop
-    npx @wp-now/wp-now start --port 8881 --blueprint=./blueprint.json
+    npx @wp-now/wp-now start --skip-browser --port 8881 --blueprint=./blueprint.json
 
 build-start: build start
 clean-start: install build-start
