@@ -35,12 +35,12 @@ This is a WordPress Gutenberg plugin called "Vine Poster Editor" that provides a
 - **Main Plugin File**: `plugin.php` - Contains `ContentManager` class that handles all plugin functionality
 - **Custom Post Type**: `managed_content` with specialized Gutenberg integration
 - **Meta Fields**: Authors (array of objects), target audience, content type, estimated read time
-- **Block Editor Assets**: `assets/js/editor.js` (React/Gutenberg components), `assets/css/editor.css`
+- **Frontend Editor Assets**: `assets/js/frontend-editor.js` (simple editor), `assets/css/frontend-editor.css`
 - **Build Output**: `build/` directory (created by webpack)
 
 ### Key Components
-- **ContentManager Class**: Handles post type registration, meta fields, REST API, and editor enqueuing
-- **React Editor Plugin**: Custom sidebar panels for content settings, author management, audience targeting
+- **ContentManager Class**: Handles post type registration, meta fields, REST API, and frontend editor
+- **Simple Frontend Editor**: Clean, full-screen editor accessible via `?frontend-editor=1` query parameter
 - **WordPress Integration**: Uses wp-now for local development, blueprint.json for configuration
 
 ### Development Environment
@@ -55,7 +55,17 @@ This is a WordPress Gutenberg plugin called "Vine Poster Editor" that provides a
 
 ## File Structure Notes
 - `src-wordpress/` contains a full WordPress installation for development
-- `assets/` contains source files for CSS and JavaScript
+- `assets/js/frontend-editor.js` contains the simple frontend editor code
+- `assets/css/frontend-editor.css` contains frontend editor styling
+- `frontend-editor.php` contains the frontend editor template
 - `build/` contains compiled assets (not committed to git)
 - `justfile` provides development workflow automation
-- `blueprint.json` configures the WordPress Playground environment
+- `blueprint.json` configures the WordPress Playground environment and sets landing page to frontend editor
+
+## Frontend Editor
+The plugin includes a simple, clean frontend editor accessible by adding `?frontend-editor=1` to any URL. Features:
+- Full-screen editing interface
+- Title and content editing with contenteditable
+- Clean WordPress-like styling
+- Keyboard shortcuts (Ctrl+S to save)
+- No complex dependencies or recursion issues

@@ -23,7 +23,6 @@ class ContentManager
     {
         add_action('init', [$this, 'register_post_type']);
         add_action('init', [$this, 'register_meta_fields']);
-        add_action('enqueue_block_editor_assets', [$this, 'enqueue_editor_assets']);
         add_action('rest_api_init', [$this, 'register_rest_routes']);
         add_action('save_post_managed_content', [$this, 'calculate_read_time'], 10, 3);
         add_action('template_redirect', [$this, 'frontend_editor_redirect']);
@@ -126,28 +125,6 @@ class ContentManager
         ]);
     }
 
-    public function enqueue_editor_assets()
-    {
-        $screen = get_current_screen();
-        if (! $screen || $screen->post_type !== 'managed_content') {
-            return;
-        }
-
-        wp_enqueue_script(
-            'content-manager-editor',
-            plugin_dir_url(__FILE__) . 'build/editor.js',
-            ['wp-blocks', 'wp-edit-post', 'wp-element', 'wp-components'],
-            '1.0.0',
-            true
-        );
-
-        wp_enqueue_style(
-            'content-manager-editor',
-            plugin_dir_url(__FILE__) . 'assets/css/editor.css',
-            [],
-            '1.0.0'
-        );
-    }
 
     public function register_rest_routes()
     {
@@ -204,33 +181,11 @@ class ContentManager
     public function enqueue_frontend_editor_assets()
     {
         if (isset($_GET['frontend-editor']) && $_GET['frontend-editor'] === '1') {
-            // Enqueue WordPress core block library first
-            wp_enqueue_script('wp-block-library');
-            wp_enqueue_style('wp-block-library');
-            
-            // Enqueue Gutenberg editor assets
-            wp_enqueue_script('wp-blocks');
-            wp_enqueue_script('wp-block-editor');
-            wp_enqueue_script('wp-editor');
-            wp_enqueue_script('wp-element');
-            wp_enqueue_script('wp-components');
-            wp_enqueue_script('wp-data');
-            wp_enqueue_script('wp-api-fetch');
-            wp_enqueue_script('wp-url');
-            wp_enqueue_script('wp-format-library');
-
-            // Enqueue editor styles
-            wp_enqueue_style('wp-edit-blocks');
-            wp_enqueue_style('wp-editor');
-            wp_enqueue_style('wp-block-editor');
-            wp_enqueue_style('wp-components');
-            wp_enqueue_style('wp-block-library-theme');
-
-            // Enqueue our custom frontend editor script
+            // Enqueue our simple frontend editor script
             wp_enqueue_script(
                 'frontend-editor',
                 plugin_dir_url(__FILE__) . 'build/frontend-editor.js',
-                ['wp-block-library', 'wp-blocks', 'wp-block-editor', 'wp-element', 'wp-components', 'wp-data', 'wp-format-library'],
+                [],
                 '1.0.0',
                 true
             );
@@ -239,7 +194,7 @@ class ContentManager
             wp_enqueue_style(
                 'frontend-editor',
                 plugin_dir_url(__FILE__) . 'assets/css/frontend-editor.css',
-                ['wp-edit-blocks', 'wp-block-library'],
+                [],
                 '1.0.0'
             );
 
