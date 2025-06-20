@@ -13,8 +13,8 @@ import {
     DropZoneProvider 
 } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
-import { registerCoreBlocks } from '@wordpress/block-library';
+import { createBlock, serialize } from '@wordpress/blocks';
+import { registerCoreBlocks } from '@wordpress/block-library/build/index';
 import '@wordpress/format-library';
 
 const FrontendEditor = () => {
