@@ -19,18 +19,19 @@ build-dev:
 start:
     npx @wp-now/wp-now start --port 8881 --blueprint=./blueprint.json
 
-clean-start: install build start
+build-start: build start
+clean-start: install build-start
 
 start-and-watch:
     @# Attempt to stop existing services
     just stop || true
     @# build
     just build
-    @# Make a pid dir if none exists
-    mkdir -p ./pid ./logs
-    @# Start the processes in the background and save their PIDs
-    { just start > ./logs/start.log 2>&1 & echo $$! > ./pid/start; }
-    { just build-dev > ./logs/build-dev.log 2>&1 & echo $$! > ./pid/build-dev; }
+    @# Make a log dir if none exists
+    mkdir -p ./logs
+    @# Start the processes in the background
+    { just start > ./logs/start.log 2>&1 & ; }
+    { just build-dev > ./logs/build-dev.log 2>&1 & ; }
     @echo "Services started. View logs with 'just logs'. Use 'just stop' to terminate."
 
 logs:
@@ -50,21 +51,8 @@ logs:
 clear-logs:
     @rm -f ./logs/* > /dev/null 2>&1
 
-stop-by-pid:
-    @if [ ! -d "./pid" ]; then exit 0; fi
-    @find ./pid -type f -exec sh -c 'pid=$(cat "{}") && \
-        if ps -p $$pid > /dev/null 2>&1; then \
-                    kill $$pid > /dev/null 2>&1 || echo "Error: Failed to kill process $$pid"; \
-        fi' \;
-    @rm -f ./pid/* > /dev/null 2>&1
-
-stop-by-port-and-process-id:
-    @pgrep -f '[j]ust (start|build-dev|start-and-watch)' | xargs kill -9 || true
-    @lsof -ti :8881 | xargs kill -9 || true
-
 stop:
-    @just stop-by-port-and-process-id || true
-    @just stop-by-pid || true
+    @pkill -f "@wp-now/wp-now"
 
 blueprint-local:
     open index.html
@@ -74,5 +62,3 @@ blueprint-remote:
 
 git-push:
     git push
-    @# Needed because we are using a submodule in Github Pages enabled repo, and that repo needs to be updated
-    ./update-parent-repo.sh
