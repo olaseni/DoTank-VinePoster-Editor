@@ -26,6 +26,8 @@ class ContentManager
         add_action('enqueue_block_editor_assets', [$this, 'enqueue_editor_assets']);
         add_action('rest_api_init', [$this, 'register_rest_routes']);
         add_action('save_post_managed_content', [$this, 'calculate_read_time'], 10, 3);
+        add_action('template_redirect', [$this, 'frontend_editor_redirect']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_editor_assets']);
     }
 
     public function register_post_type()
@@ -189,6 +191,59 @@ class ContentManager
         update_post_meta($post_id, 'estimated_read_time', $read_time);
 
         self::log($post_id, $content, $word_count, $read_time);
+    }
+
+    public function frontend_editor_redirect()
+    {
+        if (isset($_GET['frontend-editor']) && $_GET['frontend-editor'] === '1') {
+            include plugin_dir_path(__FILE__) . 'frontend-editor.php';
+            exit;
+        }
+    }
+
+    public function enqueue_frontend_editor_assets()
+    {
+        if (isset($_GET['frontend-editor']) && $_GET['frontend-editor'] === '1') {
+            // Enqueue Gutenberg editor assets
+            wp_enqueue_script('wp-blocks');
+            wp_enqueue_script('wp-block-editor');
+            wp_enqueue_script('wp-editor');
+            wp_enqueue_script('wp-element');
+            wp_enqueue_script('wp-components');
+            wp_enqueue_script('wp-data');
+            wp_enqueue_script('wp-api-fetch');
+            wp_enqueue_script('wp-url');
+
+            // Enqueue editor styles
+            wp_enqueue_style('wp-edit-blocks');
+            wp_enqueue_style('wp-editor');
+            wp_enqueue_style('wp-block-editor');
+            wp_enqueue_style('wp-components');
+
+            // Enqueue our custom frontend editor script
+            wp_enqueue_script(
+                'frontend-editor',
+                plugin_dir_url(__FILE__) . 'build/frontend-editor.js',
+                ['wp-blocks', 'wp-block-editor', 'wp-element', 'wp-components', 'wp-data'],
+                '1.0.0',
+                true
+            );
+
+            // Enqueue our custom styles
+            wp_enqueue_style(
+                'frontend-editor',
+                plugin_dir_url(__FILE__) . 'assets/css/frontend-editor.css',
+                ['wp-edit-blocks'],
+                '1.0.0'
+            );
+
+            // Localize script with REST API data
+            wp_localize_script('frontend-editor', 'frontendEditor', [
+                'restUrl' => rest_url(),
+                'nonce' => wp_create_nonce('wp_rest'),
+                'templates' => $this->get_content_templates()
+            ]);
+        }
     }
 }
 

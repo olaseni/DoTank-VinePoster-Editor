@@ -16,7 +16,7 @@ build:
 build-dev:
     npm run start
 
-start:
+start: stop
     npx @wp-now/wp-now start --port 8881 --blueprint=./blueprint.json
 
 build-start: build start
@@ -52,7 +52,7 @@ clear-logs:
     @rm -f ./logs/* > /dev/null 2>&1
 
 stop:
-    @pkill -f "@wp-now/wp-now"
+    @pkill -f "@wp-now/wp-now" || true
 
 blueprint-local:
     open index.html
