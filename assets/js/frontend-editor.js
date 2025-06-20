@@ -5,8 +5,7 @@ import {
     WritingFlow, 
     ObserveTyping,
     BlockList,
-    BlockTools,
-    __unstableBlockToolbarLastItem
+    BlockTools
 } from '@wordpress/block-editor';
 import { 
     Popover, 
@@ -14,21 +13,26 @@ import {
     DropZoneProvider 
 } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
-import { createBlock, serialize } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
-
-const { registerCoreBlocks } = wp.blockLibrary;
-
-// Register core blocks
-registerCoreBlocks();
 
 const FrontendEditor = () => {
     const [blocks, setBlocks] = useState([]);
     const [title, setTitle] = useState('');
+    const [isBlocksRegistered, setIsBlocksRegistered] = useState(false);
+
+    // Register core blocks
+    useEffect(() => {
+        if (!isBlocksRegistered) {
+            registerCoreBlocks();
+            setIsBlocksRegistered(true);
+        }
+    }, [isBlocksRegistered]);
 
     // Initialize with default template
     useEffect(() => {
-        if (blocks.length === 0) {
+        if (isBlocksRegistered && blocks.length === 0) {
             const defaultTemplate = [
                 createBlock('core/paragraph', {
                     placeholder: 'A short description'
@@ -51,11 +55,16 @@ const FrontendEditor = () => {
             ];
             setBlocks(defaultTemplate);
         }
-    }, []);
+    }, [isBlocksRegistered, blocks.length]);
 
     const onUpdateBlocks = (newBlocks) => {
         setBlocks(newBlocks);
     };
+
+    // Don't render until blocks are registered
+    if (!isBlocksRegistered) {
+        return <div>Loading editor...</div>;
+    }
 
     return (
         <SlotFillProvider>
