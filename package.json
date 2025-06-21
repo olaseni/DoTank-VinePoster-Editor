@@ -4,6 +4,6 @@
     "start": "wp-scripts start assets/js/frontend-editor.js --output-path=build/"
   },
   "devDependencies": {
-    "@wordpress/scripts": "^26.0.0"
+    "@wordpress/scripts": "^30.18.0"
   }
 }

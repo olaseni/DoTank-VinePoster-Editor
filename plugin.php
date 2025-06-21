@@ -13,6 +13,8 @@ if (!defined('ABSPATH')) {
 
 class ContentManager
 {
+    private bool $isFrontendEditorEnabled = false;
+
     public static function log(string ...$messages)
     {
         // Convert the entire messages array to string and log it
@@ -21,13 +23,14 @@ class ContentManager
 
     public function __construct()
     {
+        $this->isFrontendEditorEnabled = ($_GET['frontend-editor'] ?? '') === '1';
         add_action('init', [$this, 'register_post_type']);
         add_action('init', [$this, 'register_meta_fields']);
         add_action('rest_api_init', [$this, 'register_rest_routes']);
         add_action('save_post_managed_content', [$this, 'calculate_read_time'], 10, 3);
         add_action('template_redirect', [$this, 'frontend_editor_redirect']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_editor_assets']);
-        add_action('admin_enqueue_scripts', [$this, 'enqueue_frontend_editor_assets']);
+        add_action('wp_print_scripts', [$this, 'debug_enqueued_scripts']);
     }
 
     public function register_post_type()
@@ -173,7 +176,7 @@ class ContentManager
 
     public function frontend_editor_redirect()
     {
-        if (isset($_GET['frontend-editor']) && $_GET['frontend-editor'] === '1') {
+        if ($this->isFrontendEditorEnabled) {
             include plugin_dir_path(__FILE__) . 'frontend-editor.php';
             exit;
         }
@@ -181,34 +184,70 @@ class ContentManager
 
     public function enqueue_frontend_editor_assets()
     {
-        if (isset($_GET['frontend-editor']) && $_GET['frontend-editor'] === '1') {
-            // Use the auto-generated asset file for dependencies
-            $asset_file = plugin_dir_path(__FILE__) . 'build/frontend-editor.asset.php';
-            $asset = file_exists($asset_file) ? include $asset_file : ['dependencies' => [], 'version' => '1.0.0'];
-            
-            // Enqueue our frontend editor script with auto-generated dependencies
-            wp_enqueue_script(
-                'frontend-editor',
-                plugin_dir_url(__FILE__) . 'build/frontend-editor.js',
-                $asset['dependencies'],
-                $asset['version'],
-                true
-            );
+        // Log every time this function runs
+        error_log('enqueue_frontend_editor_assets called with GET: ' . print_r($_GET, true));
 
-            // Enqueue our custom styles
-            wp_enqueue_style(
-                'frontend-editor',
-                plugin_dir_url(__FILE__) . 'assets/css/frontend-editor.css',
-                ['wp-edit-post'],
-                $asset['version']
-            );
+        if (! $this->isFrontendEditorEnabled) {
+            error_log('Frontend editor NOT detected');
+            return;
+        }
 
-            // Localize script with REST API data
-            wp_localize_script('frontend-editor', 'frontendEditor', [
-                'restUrl' => rest_url(),
-                'nonce' => wp_create_nonce('wp_rest'),
-                'templates' => $this->get_content_templates()
-            ]);
+        error_log('Frontend editor detected, starting enqueue process');
+
+        // Use the auto-generated asset file for dependencies
+        $asset_file = plugin_dir_path(__FILE__) . 'build/frontend-editor.asset.php';
+        $asset = file_exists($asset_file) ? include $asset_file : ['dependencies' => [], 'version' => '1.0.0'];
+
+        error_log('Asset file exists: ' . (file_exists($asset_file) ? 'YES' : 'NO'));
+        error_log('Asset data: ' . print_r($asset, true));
+
+        wp_enqueue_script('react-jsx-runtime');
+
+        // Enqueue our frontend editor script with auto-generated dependencies
+        $script_enqueued = wp_enqueue_script(
+            'frontend-editor',
+            plugin_dir_url(__FILE__) . 'build/frontend-editor.js',
+            $asset['dependencies'],
+            $asset['version'],
+            true
+        );
+
+        error_log('Script enqueue result: ' . ($script_enqueued ? 'SUCCESS' : 'FAILED'));
+        error_log('Script URL: ' . plugin_dir_url(__FILE__) . 'build/frontend-editor.js');
+
+        // Enqueue our custom styles
+        $style_enqueued = wp_enqueue_style(
+            'frontend-editor',
+            plugin_dir_url(__FILE__) . 'assets/css/frontend-editor.css',
+            ['wp-edit-post'],
+            $asset['version']
+        );
+
+        error_log('Style enqueue result: ' . ($style_enqueued ? 'SUCCESS' : 'FAILED'));
+
+        // Localize script with REST API data
+        wp_localize_script('frontend-editor', 'frontendEditor', [
+            'restUrl' => rest_url(),
+            'nonce' => wp_create_nonce('wp_rest'),
+            'templates' => $this->get_content_templates()
+        ]);
+
+        error_log('Localization completed');
+        global $wp_scripts;
+        error_log(print_r([
+            'DEBUGG',
+            $wp_scripts->registered
+        ], true));
+    }
+
+    public function debug_enqueued_scripts()
+    {
+        if ($this->isFrontendEditorEnabled) {
+            global $wp_scripts;
+            error_log('=== DEBUG ENQUEUED SCRIPTS ===');
+            error_log('Enqueued scripts: ' . print_r($wp_scripts->queue, true));
+            error_log('Is frontend-editor enqueued? ' . (wp_script_is('frontend-editor', 'enqueued') ? 'YES' : 'NO'));
+            error_log('Is frontend-editor registered? ' . (wp_script_is('frontend-editor', 'registered') ? 'YES' : 'NO'));
         }
     }
 }
