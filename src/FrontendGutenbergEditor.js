@@ -136,6 +136,15 @@ const FrontendGutenbergEditor = () => {
                                         hasFixedToolbar: false,
                                         focusMode: false,
                                         hasReducedUI: false,
+                                        canUserUseUnfilteredHTML: true,
+                                        __experimentalCanUserUseUnfilteredHTML: true,
+                                        mediaUpload: true,
+                                        allowedMimeTypes: {
+                                            'image/jpeg': 'jpg',
+                                            'image/png': 'png',
+                                            'image/gif': 'gif',
+                                            'image/webp': 'webp'
+                                        }
                                     }}
                                 >
                                     <BlockTools>
