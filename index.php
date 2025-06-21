@@ -26,6 +26,7 @@
     <iframe id="wp-playground"></iframe>
     <script type="module">
         import { startPlaygroundWeb } from 'https://playground.wordpress.net/client/index.js';
+        pluginZipURL = `https://333608b5aa.nxcli.io/vine-poster-editor/plugin.zip?_=${Date.now()}`;
 
         const client = await startPlaygroundWeb({
             iframe: document.getElementById('wp-playground'),
@@ -35,7 +36,7 @@
                 login: true,
                 "plugins": [
                     "gutenberg",
-                    "https://333608b5aa.nxcli.io/vine-poster-editor/plugin.zip",
+                    pluginZipURL
                 ],
                 steps: [],
             },
