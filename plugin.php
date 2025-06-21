@@ -41,6 +41,7 @@ class ContentManager
         add_action('wp_ajax_nopriv_publish_post_content', [$this, 'ajax_publish_post_content']);
         add_action('wp_ajax_publish_post_content', [$this, 'ajax_publish_post_content']);
         add_filter('upload_mimes', [$this, 'allow_upload_mimes']);
+        add_filter('wp_check_filetype_and_ext', [$this, 'check_filetype_and_ext'], 10, 5);
     }
 
     public function register_post_type()
@@ -222,11 +223,18 @@ class ContentManager
         // Localize script with REST API data
         wp_localize_script('frontend-editor', 'frontendEditorData', [
             'restUrl' => rest_url(),
+            'mediaUrl' => rest_url('wp/v2/media'),
             'homeUrl' => home_url(),
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'postData' => [],
             'nonce' => wp_create_nonce('wp_rest'),
             'templates' => $this->get_content_templates(),
+            'allowedMimeTypes' => [
+                'jpg|jpeg|jpe' => 'image/jpeg',
+                'gif' => 'image/gif',
+                'png' => 'image/png',
+                'webp' => 'image/webp'
+            ],
             'userCapabilities' => [
                 'upload_files' => true,
                 'edit_posts' => true,
@@ -334,14 +342,32 @@ class ContentManager
 
     public function allow_upload_mimes($mimes)
     {
-        if ($this->isFrontendEditorEnabled) {
-            // Allow common image types
-            $mimes['jpg|jpeg|jpe'] = 'image/jpeg';
-            $mimes['gif'] = 'image/gif';
-            $mimes['png'] = 'image/png';
-            $mimes['webp'] = 'image/webp';
-        }
+        // Always allow these types when the plugin is active, not just frontend editor
+        // This ensures REST API uploads work too
+        $mimes['jpg|jpeg|jpe'] = 'image/jpeg';
+        $mimes['gif'] = 'image/gif';
+        $mimes['png'] = 'image/png';
+        $mimes['webp'] = 'image/webp';
+        
+        self::log('allow_upload_mimes called', 'Frontend enabled: ' . ($this->isFrontendEditorEnabled ? 'YES' : 'NO'), 'Allowed mimes: ' . print_r($mimes, true));
         return $mimes;
+    }
+
+    public function check_filetype_and_ext($data, $file, $filename, $mimes, $real_mime = null)
+    {
+        // Allow common image extensions
+        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $file_ext = pathinfo($filename, PATHINFO_EXTENSION);
+        
+        if (in_array(strtolower($file_ext), $allowed_extensions)) {
+            // Override WordPress restrictions for these image types
+            $data['ext'] = $file_ext;
+            $data['type'] = 'image/' . ($file_ext === 'jpg' ? 'jpeg' : $file_ext);
+            $data['proper_filename'] = $filename;
+        }
+        
+        self::log('check_filetype_and_ext called', 'File: ' . $filename, 'Data: ' . print_r($data, true));
+        return $data;
     }
 
     public function is_frontend_editor_request()

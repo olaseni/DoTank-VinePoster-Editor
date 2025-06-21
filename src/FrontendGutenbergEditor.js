@@ -5,7 +5,8 @@ import {
     BlockList,
     BlockTools,
     WritingFlow,
-    ObserveTyping
+    ObserveTyping,
+    MediaUpload
 } from '@wordpress/block-editor';
 import { 
     Button, 
@@ -15,6 +16,7 @@ import {
     DropZoneProvider,
     Popover
 } from '@wordpress/components';
+import { uploadMedia } from '@wordpress/media-utils';
 
 const FrontendGutenbergEditor = () => {
     const [blocks, setBlocks] = useState([]);
@@ -138,7 +140,47 @@ const FrontendGutenbergEditor = () => {
                                         hasReducedUI: false,
                                         canUserUseUnfilteredHTML: true,
                                         __experimentalCanUserUseUnfilteredHTML: true,
-                                        mediaUpload: true,
+                                        mediaUpload: ({ filesList, onFileChange, allowedTypes, onError }) => {
+                                            console.log('Media upload called with:', { filesList, allowedTypes });
+                                            console.log('Frontend editor data:', window.frontendEditorData);
+                                            
+                                            // Handle allowedTypes being undefined by using image types
+                                            const types = allowedTypes || ['image'];
+                                            console.log('Using allowedTypes:', types);
+                                            
+                                            // WordPress expects MIME types in this format for client-side validation
+                                            const wpMimeTypes = {
+                                                'jpg|jpeg|jpe': 'image/jpeg',
+                                                'gif': 'image/gif', 
+                                                'png': 'image/png',
+                                                'webp': 'image/webp'
+                                            };
+                                            
+                                            uploadMedia({
+                                                filesList,
+                                                onFileChange: (media) => {
+                                                    console.log('Upload successful:', media);
+                                                    if (Array.isArray(media)) {
+                                                        onFileChange(media);
+                                                    } else {
+                                                        onFileChange([media]);
+                                                    }
+                                                },
+                                                allowedTypes: types,
+                                                onError: (error) => {
+                                                    console.error('Upload error:', error);
+                                                    if (onError) {
+                                                        onError(error);
+                                                    } else {
+                                                        alert('Upload failed: ' + (error.message || error));
+                                                    }
+                                                },
+                                                wpAllowedMimeTypes: wpMimeTypes,
+                                                additionalData: {
+                                                    _wpnonce: window.frontendEditorData?.nonce
+                                                }
+                                            });
+                                        },
                                         allowedMimeTypes: {
                                             'image/jpeg': 'jpg',
                                             'image/png': 'png',
