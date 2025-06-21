@@ -65,6 +65,10 @@ const FrontendGutenbergEditor = () => {
         const content = serialize(blocks);
         const action = status === 'publish' ? 'publish_post_content' : 'save_post_content';
         
+        console.log('Saving post:', { action, postId, title, content: content.substring(0, 100) + '...', excerpt });
+        console.log('Using nonce:', window.frontendEditorData.nonce);
+        console.log('AJAX URL:', window.frontendEditorData.ajaxUrl);
+        
         try {
             const response = await fetch(window.frontendEditorData.ajaxUrl, {
                 method: 'POST',
@@ -81,7 +85,17 @@ const FrontendGutenbergEditor = () => {
                 }),
             });
             
-            const result = await response.json();
+            console.log('Response status:', response.status, response.statusText);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const responseText = await response.text();
+            console.log('Raw response:', responseText);
+            
+            const result = JSON.parse(responseText);
+            console.log('Parsed result:', result);
             
             if (result.success) {
                 alert(result.data.message);
@@ -95,7 +109,7 @@ const FrontendGutenbergEditor = () => {
                 alert(result.data.message || 'An error occurred');
             }
         } catch (error) {
-            alert('Network error occurred');
+            alert('Network error occurred: ' + error.message);
             console.error('Save error:', error);
         } finally {
             setIsSaving(false);
