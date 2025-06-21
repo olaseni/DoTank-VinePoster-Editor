@@ -1,0 +1,520 @@
+/* Native Gutenberg Editor Styles */
+.block-editor-page {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: #fff;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+#frontend-editor-root {
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Hide WordPress admin bar */
+html.wp-toolbar {
+    padding-top: 0 !important;
+}
+
+#wpadminbar {
+    display: none !important;
+}
+
+/* Ensure full screen editor */
+.edit-post-layout {
+    height: 100vh !important;
+}
+
+.edit-post-layout__content {
+    height: 100vh !important;
+}
+
+/* Loading fallback styles */
+.editor-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    color: #666;
+}
+
+.editor-loading p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+// Frontend Gutenberg Editor Styles
+
+.frontend-gutenberg-editor {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.frontend-editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f8f9fa;
+    min-height: 60px;
+    
+    .editor-title {
+        color: #666;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+        letter-spacing: 0.5px;
+    }
+    
+    .editor-header-center {
+        flex: 1;
+        margin: 0 24px;
+        
+        .editor-title-input {
+            .components-text-control__input {
+                border: none;
+                background: transparent;
+                font-size: 24px;
+                font-weight: 600;
+                text-align: center;
+                padding: 8px 16px;
+                width: 100%;
+                
+                &:focus {
+                    box-shadow: 0 0 0 2px #4CAF50;
+                    border-radius: 4px;
+                }
+            }
+        }
+    }
+    
+    .editor-header-right {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        
+        .preview-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            
+            &:hover:not(:disabled) {
+                background: #45a049;
+            }
+            
+            &:disabled {
+                opacity: 0.6;
+            }
+        }
+        
+        .settings-btn,
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: #666;
+            padding: 8px;
+            border-radius: 4px;
+            
+            &:hover:not(:disabled) {
+                background: #e0e0e0;
+            }
+            
+            &:disabled {
+                opacity: 0.6;
+            }
+        }
+    }
+}
+
+.frontend-editor-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.frontend-editor-main {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    
+    .frontend-editor-title-section {
+        margin-bottom: 24px;
+        width: 100%;
+        
+        .frontend-editor-title {
+            .components-text-control__input {
+                border: none;
+                background: white;
+                font-size: 32px;
+                font-weight: 600;
+                color: #333;
+                padding: 16px;
+                margin-bottom: 12px;
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                
+                &::placeholder {
+                    color: #999;
+                    font-weight: 300;
+                }
+                
+                &:focus {
+                    box-shadow: 0 0 0 2px #4CAF50;
+                    outline: none;
+                }
+            }
+        }
+        
+        .frontend-editor-description {
+            .components-textarea-control__input {
+                border: none;
+                background: white;
+                font-size: 16px;
+                color: #666;
+                padding: 16px;
+                resize: none;
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                
+                &::placeholder {
+                    color: #999;
+                }
+                
+                &:focus {
+                    box-shadow: 0 0 0 2px #4CAF50;
+                    outline: none;
+                }
+            }
+        }
+    }
+    
+    .frontend-editor-blocks {
+        flex: 1;
+        width: 100%;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        min-height: 0; // Important for flex child with overflow
+        
+        .block-editor-block-contextual-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 31;
+            margin-bottom: 16px;
+        }
+        
+        .components-block-editor-provider {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .block-editor-writing-flow {
+            flex: 1;
+            overflow-y: auto;
+            
+            .wp-block {
+                max-width: none;
+                margin: 16px 0;
+            }
+        }
+        
+        .block-editor-block-list__layout {
+            min-height: 100%;
+            padding-bottom: 50vh; // Allow scrolling past last block
+            
+            .wp-block {
+                max-width: none;
+            }
+            
+            .wp-block[data-type] {
+                margin: 16px 0;
+            }
+        }
+        
+        // Ensure blocks can grow to fill space
+        .block-editor-block-list__block {
+            .wp-block {
+                min-height: 40px;
+            }
+        }
+    }
+}
+
+.frontend-editor-sidebar {
+    width: 320px;
+    background: #f8f9fa;
+    border-left: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    
+    .sidebar-tabs {
+        display: flex;
+        border-bottom: 1px solid #e0e0e0;
+        background: white;
+        
+        .sidebar-tab {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            
+            &:hover {
+                background: #f0f0f0;
+            }
+            
+            &.active {
+                color: #4CAF50;
+                border-bottom-color: #4CAF50;
+                background: #f8f9fa;
+            }
+        }
+    }
+    
+    .sidebar-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+    }
+    
+    .sidebar-section {
+        margin-bottom: 24px;
+        
+        .sidebar-title {
+            color: #333;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    }
+    
+    .columns-grid {
+        display: flex;
+        gap: 8px;
+        
+        .column-option {
+            cursor: pointer;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            
+            &:hover {
+                border-color: #4CAF50;
+            }
+            
+            .column-preview {
+                display: flex;
+                gap: 4px;
+                height: 20px;
+                
+                &.single {
+                    background: #ddd;
+                    border-radius: 2px;
+                }
+                
+                .col {
+                    flex: 1;
+                    background: #ddd;
+                    border-radius: 2px;
+                }
+            }
+        }
+    }
+    
+    .blocks-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        
+        .block-option {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+            min-height: 60px;
+            font-size: 11px;
+            color: #666;
+            
+            &:hover {
+                border-color: #4CAF50;
+            }
+            
+            svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    }
+    
+    .featured-image-placeholder {
+        .image-placeholder {
+            background: white;
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 14px;
+            cursor: pointer;
+            
+            &:hover {
+                border-color: #4CAF50;
+            }
+        }
+    }
+    
+    .tags-container {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        
+        .tag-button {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: #666;
+            
+            &:hover {
+                border-color: #4CAF50;
+            }
+        }
+    }
+}
+
+.frontend-editor-footer {
+    display: flex;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid #e0e0e0;
+    background: #f8f9fa;
+    justify-content: flex-end;
+    
+    .save-draft-btn {
+        background: white;
+        color: #4CAF50;
+        border: 1px solid #4CAF50;
+        padding: 12px 24px;
+        border-radius: 4px;
+        font-weight: 500;
+        
+        &:hover:not(:disabled) {
+            background: #f0f8f0;
+        }
+        
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+    
+    .publish-btn {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+        font-weight: 500;
+        
+        &:hover:not(:disabled) {
+            background: #45a049;
+        }
+        
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+}
+
+// Gutenberg Block Editor Overrides
+.frontend-gutenberg-editor {
+    .block-editor-inserter {
+        .components-popover__content {
+            z-index: 1000000;
+        }
+    }
+    
+    .components-popover {
+        z-index: 1000000;
+    }
+    
+    .block-editor-block-list__layout {
+        .wp-block[data-type] {
+            margin: 16px 0;
+        }
+    }
+    
+    .block-editor-block-toolbar {
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+    .frontend-editor-content {
+        flex-direction: column;
+    }
+    
+    .frontend-editor-sidebar {
+        width: 100%;
+        max-height: 300px;
+        border-left: none;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .frontend-editor-header {
+        .editor-header-center {
+            margin: 0 12px;
+        }
+    }
+    
+    .frontend-editor-main {
+        padding: 16px;
+        
+        .frontend-editor-title-section,
+        .frontend-editor-blocks {
+            max-width: none;
+        }
+    }
+}

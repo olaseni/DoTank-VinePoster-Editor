@@ -195,49 +195,44 @@ class ContentManager
         error_log('Frontend editor detected, starting enqueue process');
 
         // Use the auto-generated asset file for dependencies
-        $asset_file = plugin_dir_path(__FILE__) . 'build/frontend-editor.asset.php';
+        $asset_file = plugin_dir_path(__FILE__) . 'build/index.asset.php';
         $asset = file_exists($asset_file) ? include $asset_file : ['dependencies' => [], 'version' => '1.0.0'];
 
         error_log('Asset file exists: ' . (file_exists($asset_file) ? 'YES' : 'NO'));
         error_log('Asset data: ' . print_r($asset, true));
 
-        wp_enqueue_script('react-jsx-runtime');
-
-        // Enqueue our frontend editor script with auto-generated dependencies
         $script_enqueued = wp_enqueue_script(
             'frontend-editor',
-            plugin_dir_url(__FILE__) . 'build/frontend-editor.js',
+            plugin_dir_url(__FILE__) . 'build/index.js',
             $asset['dependencies'],
             $asset['version'],
             true
         );
 
         error_log('Script enqueue result: ' . ($script_enqueued ? 'SUCCESS' : 'FAILED'));
-        error_log('Script URL: ' . plugin_dir_url(__FILE__) . 'build/frontend-editor.js');
+        error_log('Script URL: ' . plugin_dir_url(__FILE__) . 'build/index.js');
 
         // Enqueue our custom styles
         $style_enqueued = wp_enqueue_style(
             'frontend-editor',
             plugin_dir_url(__FILE__) . 'assets/css/frontend-editor.css',
-            ['wp-edit-post'],
+            ['wp-edit-post', 'wp-block-editor', 'wp-components'],
             $asset['version']
         );
 
         error_log('Style enqueue result: ' . ($style_enqueued ? 'SUCCESS' : 'FAILED'));
 
         // Localize script with REST API data
-        wp_localize_script('frontend-editor', 'frontendEditor', [
+        wp_localize_script('frontend-editor', 'frontendEditorData', [
             'restUrl' => rest_url(),
+            'homeUrl' => home_url(),
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'postData' => [],
             'nonce' => wp_create_nonce('wp_rest'),
             'templates' => $this->get_content_templates()
         ]);
 
         error_log('Localization completed');
-        global $wp_scripts;
-        error_log(print_r([
-            'DEBUGG',
-            $wp_scripts->registered
-        ], true));
     }
 
     public function debug_enqueued_scripts()

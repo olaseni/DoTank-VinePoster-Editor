@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "build": "wp-scripts build assets/js/frontend-editor.js --output-path=build/",
-    "start": "wp-scripts start assets/js/frontend-editor.js --output-path=build/"
+    "build": "wp-scripts build",
+    "start": "wp-scripts start"
   },
   "devDependencies": {
     "@wordpress/scripts": "^30.18.0"
