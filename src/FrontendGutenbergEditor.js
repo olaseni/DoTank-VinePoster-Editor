@@ -1,5 +1,5 @@
 import { useState, useEffect } from '@wordpress/element';
-import { parse, serialize } from '@wordpress/blocks';
+import { parse, serialize, createBlock } from '@wordpress/blocks';
 import { 
     BlockEditorProvider, 
     BlockList,
@@ -26,7 +26,8 @@ const FrontendGutenbergEditor = () => {
     // Use default WordPress registry
 
     useEffect(() => {
-        if (window.frontendEditorData?.postData) {
+        // Initialize with default values
+        if (window.frontendEditorData?.postData && Object.keys(window.frontendEditorData.postData).length > 0) {
             const post = window.frontendEditorData.postData;
             setTitle(post.title || '');
             setExcerpt(post.excerpt || '');
@@ -36,17 +37,23 @@ const FrontendGutenbergEditor = () => {
             if (post.content) {
                 setBlocks(parse(post.content));
             } else {
-                // Start with a paragraph block
+                // Start with a paragraph block using createBlock
                 setBlocks([
-                    {
-                        name: 'core/paragraph',
-                        attributes: {
-                            content: 'Start writing your content here...'
-                        },
-                        innerBlocks: []
-                    }
+                    createBlock('core/paragraph', {
+                        content: 'Start writing your content here...'
+                    })
                 ]);
             }
+        } else {
+            // No post data - initialize with default empty post
+            setTitle('');
+            setExcerpt('');
+            setPostId(0);
+            setBlocks([
+                createBlock('core/paragraph', {
+                    content: 'Start writing your content here...'
+                })
+            ]);
         }
     }, []);
 

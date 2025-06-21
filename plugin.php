@@ -31,6 +31,17 @@ class ContentManager
         add_action('template_redirect', [$this, 'frontend_editor_redirect']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_editor_assets']);
         add_action('wp_print_scripts', [$this, 'debug_enqueued_scripts']);
+        add_action('wp_ajax_nopriv_save_post_content', [$this, 'ajax_save_post_content']);
+        add_action('wp_ajax_save_post_content', [$this, 'ajax_save_post_content']);
+        add_action('wp_ajax_nopriv_publish_post_content', [$this, 'ajax_publish_post_content']);
+        add_action('wp_ajax_publish_post_content', [$this, 'ajax_publish_post_content']);
+        add_filter('upload_mimes', [$this, 'allow_upload_mimes']);
+        add_filter('map_meta_cap', [$this, 'grant_frontend_editor_caps'], 10, 4);
+        
+        // Grant capabilities for all media/REST API requests when frontend editor is detected
+        if ($this->isFrontendEditorEnabled || $this->is_frontend_editor_ajax()) {
+            add_filter('user_has_cap', [$this, 'grant_temporary_caps'], 10, 3);
+        }
     }
 
     public function register_post_type()
@@ -177,6 +188,8 @@ class ContentManager
     public function frontend_editor_redirect()
     {
         if ($this->isFrontendEditorEnabled) {
+            // Temporarily grant admin capabilities for frontend editor
+            add_filter('user_has_cap', [$this, 'grant_temporary_caps'], 10, 3);
             include plugin_dir_path(__FILE__) . 'frontend-editor.php';
             exit;
         }
@@ -244,6 +257,140 @@ class ContentManager
             error_log('Is frontend-editor enqueued? ' . (wp_script_is('frontend-editor', 'enqueued') ? 'YES' : 'NO'));
             error_log('Is frontend-editor registered? ' . (wp_script_is('frontend-editor', 'registered') ? 'YES' : 'NO'));
         }
+    }
+
+    public function ajax_save_post_content()
+    {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'wp_rest')) {
+            wp_die(json_encode(['success' => false, 'data' => ['message' => 'Invalid nonce']]));
+        }
+
+        $post_id = intval($_POST['post_id']);
+        $title = sanitize_text_field($_POST['title']);
+        $content = wp_kses_post($_POST['content']);
+        $excerpt = sanitize_textarea_field($_POST['excerpt']);
+
+        $post_data = [
+            'post_title' => $title,
+            'post_content' => $content,
+            'post_excerpt' => $excerpt,
+            'post_type' => 'managed_content',
+            'post_status' => 'draft'
+        ];
+
+        if ($post_id > 0) {
+            $post_data['ID'] = $post_id;
+            $result = wp_update_post($post_data);
+        } else {
+            $result = wp_insert_post($post_data);
+        }
+
+        if (is_wp_error($result)) {
+            wp_die(json_encode(['success' => false, 'data' => ['message' => $result->get_error_message()]]));
+        }
+
+        wp_die(json_encode([
+            'success' => true, 
+            'data' => [
+                'message' => 'Post saved successfully',
+                'post_id' => $result
+            ]
+        ]));
+    }
+
+    public function ajax_publish_post_content()
+    {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'wp_rest')) {
+            wp_die(json_encode(['success' => false, 'data' => ['message' => 'Invalid nonce']]));
+        }
+
+        $post_id = intval($_POST['post_id']);
+        $title = sanitize_text_field($_POST['title']);
+        $content = wp_kses_post($_POST['content']);
+        $excerpt = sanitize_textarea_field($_POST['excerpt']);
+
+        $post_data = [
+            'post_title' => $title,
+            'post_content' => $content,
+            'post_excerpt' => $excerpt,
+            'post_type' => 'managed_content',
+            'post_status' => 'publish'
+        ];
+
+        if ($post_id > 0) {
+            $post_data['ID'] = $post_id;
+            $result = wp_update_post($post_data);
+        } else {
+            $result = wp_insert_post($post_data);
+        }
+
+        if (is_wp_error($result)) {
+            wp_die(json_encode(['success' => false, 'data' => ['message' => $result->get_error_message()]]));
+        }
+
+        $post_url = get_permalink($result);
+
+        wp_die(json_encode([
+            'success' => true, 
+            'data' => [
+                'message' => 'Post published successfully',
+                'post_id' => $result,
+                'post_url' => $post_url
+            ]
+        ]));
+    }
+
+    public function allow_upload_mimes($mimes)
+    {
+        if ($this->isFrontendEditorEnabled) {
+            // Allow common image types
+            $mimes['jpg|jpeg|jpe'] = 'image/jpeg';
+            $mimes['gif'] = 'image/gif';
+            $mimes['png'] = 'image/png';
+            $mimes['webp'] = 'image/webp';
+        }
+        return $mimes;
+    }
+
+    public function grant_frontend_editor_caps($caps, $cap, $user_id, $args)
+    {
+        if ($this->isFrontendEditorEnabled) {
+            // Grant media upload capabilities for frontend editor
+            if (in_array($cap, ['upload_files', 'edit_posts', 'publish_posts'])) {
+                return ['exist']; // Minimal capability that everyone has
+            }
+        }
+        return $caps;
+    }
+
+    public function is_frontend_editor_ajax()
+    {
+        return (defined('DOING_AJAX') && DOING_AJAX && 
+                (isset($_POST['action']) && in_array($_POST['action'], ['save_post_content', 'publish_post_content']))) ||
+               (wp_doing_ajax() && isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'frontend-editor=1') !== false);
+    }
+
+    public function grant_temporary_caps($allcaps, $caps, $args)
+    {
+        // Grant essential capabilities for frontend editing
+        $editor_caps = [
+            'upload_files',
+            'edit_posts',
+            'edit_others_posts',
+            'publish_posts',
+            'read',
+            'edit_files',
+            'manage_options', // For media library access
+            'unfiltered_html'
+        ];
+
+        foreach ($editor_caps as $cap) {
+            $allcaps[$cap] = true;
+        }
+
+        return $allcaps;
     }
 }
 
