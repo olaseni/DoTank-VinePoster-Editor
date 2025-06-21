@@ -17,6 +17,7 @@ import {
     Popover
 } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
+import EditorSidebar from './components/EditorSidebar';
 
 const FrontendGutenbergEditor = () => {
     const [blocks, setBlocks] = useState([]);
@@ -123,7 +124,7 @@ const FrontendGutenbergEditor = () => {
     return (
         <SlotFillProvider>
             <DropZoneProvider>
-                <div className="frontend-gutenberg-editor">
+                <div className="frontend-gutenberg-editor has-sidebar">
             
                     <div className="frontend-editor-content">
                         <div className="frontend-editor-main">
@@ -235,6 +236,8 @@ const FrontendGutenbergEditor = () => {
                             Publish
                         </Button>
                     </div>
+                    
+                    <EditorSidebar />
                     
                     <Popover.Slot />
                 </div>
