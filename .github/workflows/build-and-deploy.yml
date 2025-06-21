@@ -34,7 +34,6 @@ jobs:
         run: |
           cp plugin.php vine-poster-plugin/
           cp -r build vine-poster-plugin/
-          cp -r assets vine-poster-plugin/
           
       - name: Create plugin zip
         run: |
