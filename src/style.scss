@@ -1,6 +1,93 @@
 /* Gutenberg Native Editor Styles */
 @import './components/EditorSidebar.scss';
 
+/* Template Block Restrictions */
+.frontend-gutenberg-editor {
+    /* Hide all floating toolbars for first two blocks */
+    .block-editor-block-list__block:first-child,
+    .block-editor-block-list__block:nth-child(2) {
+        /* Hide block toolbar */
+        .block-editor-block-toolbar {
+            display: none !important;
+        }
+        
+        /* Hide block mover controls */
+        .block-editor-block-mover {
+            display: none !important;
+        }
+        
+        /* Hide block settings menu */
+        .block-editor-block-settings-menu {
+            display: none !important;
+        }
+        
+        /* Hide format toolbar */
+        .block-editor-format-toolbar {
+            display: none !important;
+        }
+        
+        /* Remove hover outline and controls */
+        &:hover {
+            outline: none !important;
+            
+            .block-editor-block-toolbar,
+            .block-editor-block-mover,
+            .block-editor-block-settings-menu,
+            .components-toolbar,
+            .block-editor-block-contextual-toolbar {
+                display: none !important;
+            }
+        }
+        
+        /* Hide selection outline */
+        &.is-selected {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* Disable block selection handles */
+        .block-editor-block-list__block-selection-button {
+            display: none !important;
+        }
+    }
+    
+    /* Hide floating popover toolbars globally when first two blocks are selected */
+    &:has(.block-editor-block-list__block:first-child.is-selected) .components-popover.block-editor-block-toolbar__popover,
+    &:has(.block-editor-block-list__block:nth-child(2).is-selected) .components-popover.block-editor-block-toolbar__popover {
+        display: none !important;
+    }
+}
+
+/* More aggressive hiding of floating toolbars */
+.components-popover.block-editor-block-toolbar__popover {
+    &[data-floating-ui-portal] {
+        display: none !important;
+    }
+}
+
+/* Hide all floating toolbars when template blocks are focused */
+.frontend-gutenberg-editor .wp-block[data-type="core/heading"]:first-child:focus,
+.frontend-gutenberg-editor .wp-block[data-type="core/paragraph"]:nth-child(2):focus,
+.frontend-gutenberg-editor .wp-block[data-type="core/heading"]:first-child.is-selected,
+.frontend-gutenberg-editor .wp-block[data-type="core/paragraph"]:nth-child(2).is-selected {
+    ~ * .components-popover.block-editor-block-toolbar__popover {
+        display: none !important;
+    }
+}
+
+/* Hide formatting controls in sidebar for template blocks */
+.block-editor-block-inspector .components-panel:has(.components-base-control__label:contains("Typography")),
+.block-editor-block-inspector .components-panel:has(.components-base-control__label:contains("Color")),
+.block-editor-block-inspector .components-panel:has(.components-base-control__label:contains("Dimensions")) {
+    display: none !important;
+}
+
+/* Hide advanced panel for template blocks */
+.frontend-gutenberg-editor .wp-block:first-child.is-selected ~ * .block-editor-block-inspector .components-panel__body:last-child,
+.frontend-gutenberg-editor .wp-block:nth-child(2).is-selected ~ * .block-editor-block-inspector .components-panel__body:last-child {
+    display: none !important;
+}
+
 /* Prevent any scrollbars and reset positioning */
 html, body {
     overflow-x: hidden !important;

@@ -11,10 +11,9 @@ import {
     store as blockEditorStore
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { addFilter } from '@wordpress/hooks';
 import { 
     Button, 
-    TextControl, 
-    TextareaControl,
     SlotFillProvider,
     DropZoneProvider,
     Popover
@@ -24,13 +23,86 @@ import EditorSidebar from './components/EditorSidebar';
 
 const FrontendGutenbergEditor = () => {
     const [blocks, setBlocks] = useState([]);
-    const [title, setTitle] = useState('');
-    const [excerpt, setExcerpt] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const [postId, setPostId] = useState(0);
     
     // Track current insertion index (where new blocks should be inserted)
     const [currentInsertionIndex, setCurrentInsertionIndex] = useState(-1);
+
+    // Add filter to disable block controls for template blocks
+    useEffect(() => {
+        const disableBlockControls = (settings, name) => {
+            // Check if this is one of our template blocks
+            if (name === 'core/heading' || name === 'core/paragraph') {
+                return {
+                    ...settings,
+                    supports: {
+                        ...settings.supports,
+                        // Disable formatting toolbar
+                        __experimentalToolbar: false,
+                        // Disable block controls
+                        inserter: false,
+                        multiple: false,
+                        reusable: false,
+                        // Disable text formatting
+                        formatting: false,
+                        // Disable styling options
+                        color: false,
+                        fontSize: false,
+                        anchor: false,
+                        align: false,
+                        alignWide: false,
+                        className: false,
+                        customClassName: false,
+                        html: false,
+                        dropCap: false
+                    }
+                };
+            }
+            return settings;
+        };
+
+        addFilter(
+            'blocks.registerBlockType',
+            'vine-poster/disable-template-block-controls',
+            disableBlockControls
+        );
+
+        // Hide floating toolbars for template blocks
+        const hideFloatingToolbars = () => {
+            const popovers = document.querySelectorAll('.components-popover.block-editor-block-toolbar__popover');
+            const templateBlocks = document.querySelectorAll('.block-editor-block-list__block:first-child, .block-editor-block-list__block:nth-child(2)');
+            
+            templateBlocks.forEach(block => {
+                if (block.classList.contains('is-selected')) {
+                    popovers.forEach(popover => {
+                        popover.style.display = 'none';
+                    });
+                }
+            });
+        };
+
+        // Monitor for floating toolbar appearances
+        const observer = new MutationObserver(() => {
+            hideFloatingToolbars();
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        // Also hide on selection changes
+        document.addEventListener('selectionchange', hideFloatingToolbars);
+        document.addEventListener('click', hideFloatingToolbars);
+
+        // Cleanup
+        return () => {
+            observer.disconnect();
+            document.removeEventListener('selectionchange', hideFloatingToolbars);
+            document.removeEventListener('click', hideFloatingToolbars);
+        };
+    }, []);
 
     // Use default WordPress registry
 
@@ -38,29 +110,61 @@ const FrontendGutenbergEditor = () => {
         // Initialize with default values
         if (window.frontendEditorData?.postData && Object.keys(window.frontendEditorData.postData).length > 0) {
             const post = window.frontendEditorData.postData;
-            setTitle(post.title || '');
-            setExcerpt(post.excerpt || '');
             setPostId(post.id || 0);
             
             // Parse existing content into blocks
             if (post.content) {
-                setBlocks(parse(post.content));
+                const parsedBlocks = parse(post.content);
+                
+                // Ensure first two blocks have the proper lock attributes
+                if (parsedBlocks.length >= 2) {
+                    if (parsedBlocks[0].name === 'core/heading') {
+                        parsedBlocks[0].attributes = {
+                            ...parsedBlocks[0].attributes,
+                            lock: { move: true, remove: true }
+                        };
+                    }
+                    if (parsedBlocks[1].name === 'core/paragraph') {
+                        parsedBlocks[1].attributes = {
+                            ...parsedBlocks[1].attributes,
+                            lock: { move: true, remove: true }
+                        };
+                    }
+                }
+                
+                setBlocks(parsedBlocks);
             } else {
-                // Start with a paragraph block using createBlock
+                // Create initial template blocks manually for new posts
                 setBlocks([
+                    createBlock('core/heading', {
+                        content: post.title || '',
+                        level: 1,
+                        placeholder: 'Add title ...',
+                        lock: { move: true, remove: true },
+                        isTemplateBlock: true
+                    }),
                     createBlock('core/paragraph', {
-                        placeholder: 'Start writing your content here...'
+                        placeholder: 'Add short description ...',
+                        lock: { move: true, remove: true },
+                        isTemplateBlock: true
                     })
                 ]);
             }
         } else {
-            // No post data - initialize with default empty post
-            setTitle('');
-            setExcerpt('');
+            // No post data - create initial template blocks
             setPostId(0);
             setBlocks([
+                createBlock('core/heading', {
+                    content: '',
+                    level: 1,
+                    placeholder: 'Add title ...',
+                    lock: { move: true, remove: true },
+                    isTemplateBlock: true
+                }),
                 createBlock('core/paragraph', {
-                    placeholder: 'Start writing your content here...'
+                    placeholder: 'Add short description ...',
+                    lock: { move: true, remove: true },
+                    isTemplateBlock: true
                 })
             ]);
         }
@@ -71,6 +175,15 @@ const FrontendGutenbergEditor = () => {
         
         const content = serialize(blocks);
         const action = status === 'publish' ? 'publish_post_content' : 'save_post_content';
+        
+        // Extract title from the first heading block
+        const titleBlock = blocks.find(block => block.name === 'core/heading' && block.attributes?.level === 1);
+        const title = titleBlock?.attributes?.content || 'Untitled Post';
+        
+        // Extract excerpt from the first paragraph block
+        const excerptBlock = blocks.find(block => block.name === 'core/paragraph' && block.attributes?.content);
+        const excerpt = excerptBlock?.attributes?.content ? 
+            excerptBlock.attributes.content.substring(0, 150) + '...' : '';
         
         console.log('Saving post:', { action, postId, title, content: content.substring(0, 100) + '...', excerpt });
         console.log('Using nonce:', window.frontendEditorData.nonce);
@@ -130,7 +243,9 @@ const FrontendGutenbergEditor = () => {
     // Function to insert a new block at the current position
     const handleInsertBlock = (newBlock, insertIndex = -1) => {
         const updatedBlocks = [...blocks];
-        const index = insertIndex >= 0 ? insertIndex : blocks.length;
+        // Ensure we don't insert before the locked template blocks (first 2)
+        const minIndex = 2;
+        const index = insertIndex >= 0 ? Math.max(insertIndex, minIndex) : blocks.length;
         updatedBlocks.splice(index, 0, newBlock);
         setBlocks(updatedBlocks);
         
@@ -155,22 +270,6 @@ const FrontendGutenbergEditor = () => {
             
                     <div className="frontend-editor-content">
                         <div className="frontend-editor-main">
-                            <div className="frontend-editor-title-section">
-                                <TextControl
-                                    placeholder="Enter title here"
-                                    value={title}
-                                    onChange={setTitle}
-                                    className="frontend-editor-title"
-                                />
-                                <TextareaControl
-                                    placeholder="Write an excerpt (optional)"
-                                    value={excerpt}
-                                    onChange={setExcerpt}
-                                    className="frontend-editor-description"
-                                    rows={2}
-                                />
-                            </div>
-
                             <div className="frontend-editor-blocks">
                                 <BlockEditorProvider
                                     value={blocks}
@@ -186,6 +285,52 @@ const FrontendGutenbergEditor = () => {
                                         hasReducedUI: false,
                                         canUserUseUnfilteredHTML: true,
                                         __experimentalCanUserUseUnfilteredHTML: true,
+                                        template: [
+                                            ['core/heading', { 
+                                                level: 1, 
+                                                placeholder: 'Add title ...',
+                                                lock: { move: true, remove: true }
+                                            }],
+                                            ['core/paragraph', { 
+                                                placeholder: 'Add short description ...',
+                                                lock: { move: true, remove: true }
+                                            }]
+                                        ],
+                                        templateLock: 'insert',
+                                        // Custom block type settings to disable formatting and controls
+                                        __experimentalBlockTypeSettings: {
+                                            'core/heading': {
+                                                supports: {
+                                                    formatting: false,
+                                                    color: false,
+                                                    fontSize: false,
+                                                    anchor: false,
+                                                    align: false,
+                                                    alignWide: false,
+                                                    className: false,
+                                                    customClassName: false,
+                                                    html: false,
+                                                    inserter: false,
+                                                    multiple: false,
+                                                    reusable: false
+                                                }
+                                            },
+                                            'core/paragraph': {
+                                                supports: {
+                                                    formatting: false,
+                                                    color: false,
+                                                    fontSize: false,
+                                                    anchor: false,
+                                                    align: false,
+                                                    alignWide: false,
+                                                    className: false,
+                                                    customClassName: false,
+                                                    html: false,
+                                                    inserter: false,
+                                                    dropCap: false
+                                                }
+                                            }
+                                        },
                                         mediaUpload: ({ filesList, onFileChange, allowedTypes, onError }) => {
                                             console.log('Media upload called with:', { filesList, allowedTypes });
                                             console.log('Frontend editor data:', window.frontendEditorData);
