@@ -6,8 +6,11 @@ import {
     BlockTools,
     WritingFlow,
     ObserveTyping,
-    MediaUpload
+    MediaUpload,
+    useBlockProps,
+    store as blockEditorStore
 } from '@wordpress/block-editor';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { 
     Button, 
     TextControl, 
@@ -25,6 +28,9 @@ const FrontendGutenbergEditor = () => {
     const [excerpt, setExcerpt] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const [postId, setPostId] = useState(0);
+    
+    // Track current insertion index (where new blocks should be inserted)
+    const [currentInsertionIndex, setCurrentInsertionIndex] = useState(-1);
 
     // Use default WordPress registry
 
@@ -121,6 +127,27 @@ const FrontendGutenbergEditor = () => {
         window.location.href = window.frontendEditorData.homeUrl;
     };
 
+    // Function to insert a new block at the current position
+    const handleInsertBlock = (newBlock, insertIndex = -1) => {
+        const updatedBlocks = [...blocks];
+        const index = insertIndex >= 0 ? insertIndex : blocks.length;
+        updatedBlocks.splice(index, 0, newBlock);
+        setBlocks(updatedBlocks);
+        
+        // Set insertion index to after the newly inserted block
+        setCurrentInsertionIndex(index + 1);
+        
+        console.log(`Inserted ${newBlock.name} at index ${index}`);
+    };
+
+    // Track block selection to update insertion point
+    const handleBlockSelection = (clientId) => {
+        if (clientId) {
+            const blockIndex = blocks.findIndex(block => block.clientId === clientId);
+            setCurrentInsertionIndex(blockIndex + 1);
+        }
+    };
+
     return (
         <SlotFillProvider>
             <DropZoneProvider>
@@ -148,7 +175,11 @@ const FrontendGutenbergEditor = () => {
                                 <BlockEditorProvider
                                     value={blocks}
                                     onInput={setBlocks}
-                                    onChange={setBlocks}
+                                    onChange={(newBlocks) => {
+                                        setBlocks(newBlocks);
+                                        // Update insertion index when blocks change
+                                        setCurrentInsertionIndex(newBlocks.length);
+                                    }}
                                     settings={{
                                         hasFixedToolbar: false,
                                         focusMode: false,
@@ -237,7 +268,10 @@ const FrontendGutenbergEditor = () => {
                         </Button>
                     </div>
                     
-                    <EditorSidebar />
+                    <EditorSidebar 
+                        onInsertBlock={handleInsertBlock}
+                        currentIndex={currentInsertionIndex}
+                    />
                     
                     <Popover.Slot />
                 </div>

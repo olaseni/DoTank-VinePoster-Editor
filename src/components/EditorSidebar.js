@@ -1,6 +1,14 @@
 import { Button, Panel, PanelBody, PanelRow } from '@wordpress/components';
+import { createBlock } from '@wordpress/blocks';
 
-const EditorSidebar = () => {
+const EditorSidebar = ({ onInsertBlock, currentIndex = -1 }) => {
+    
+    const handleInsertBlock = (blockType, attributes = {}) => {
+        const newBlock = createBlock(blockType, attributes);
+        if (onInsertBlock) {
+            onInsertBlock(newBlock, currentIndex);
+        }
+    };
     return (
         <div className="editor-sidebar">
             {/* Columns Section */}
@@ -26,26 +34,42 @@ const EditorSidebar = () => {
             <Panel className="sidebar-panel">
                 <PanelBody title="BLOCKS" initialOpen={true}>
                     <div className="blocks-grid">
-                        <div className="block-option" title="Text Block">
+                        <div 
+                            className="block-option" 
+                            title="Text Block"
+                            onClick={() => handleInsertBlock('core/paragraph', { placeholder: 'Start writing...' })}
+                        >
                             <div className="block-icon text-icon">
                                 <span>A</span>
                             </div>
                         </div>
-                        <div className="block-option" title="Image Block">
+                        <div 
+                            className="block-option" 
+                            title="Image Block"
+                            onClick={() => handleInsertBlock('core/image', { caption: '' })}
+                        >
                             <div className="block-icon image-icon">
                                 <svg viewBox="0 0 24 24" width="16" height="16">
                                     <path d="M19 7v10H5V7h14m0-2H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-5 6l-3 3.72L9 13l-3 4h12l-4-5z"/>
                                 </svg>
                             </div>
                         </div>
-                        <div className="block-option" title="Media Block">
+                        <div 
+                            className="block-option" 
+                            title="Media Block"
+                            onClick={() => handleInsertBlock('core/video', {})}
+                        >
                             <div className="block-icon media-icon">
                                 <svg viewBox="0 0 24 24" width="16" height="16">
                                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
                                 </svg>
                             </div>
                         </div>
-                        <div className="block-option" title="Button Block">
+                        <div 
+                            className="block-option" 
+                            title="Button Block"
+                            onClick={() => handleInsertBlock('core/button', { text: 'Click me', url: '' })}
+                        >
                             <div className="block-icon button-icon">
                                 <span>Button</span>
                                 <svg viewBox="0 0 24 24" width="12" height="12">
