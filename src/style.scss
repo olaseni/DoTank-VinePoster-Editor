@@ -1,8 +1,8 @@
-/* Native Gutenberg Editor Styles */
+/* Gutenberg Native Editor Styles */
 .block-editor-page {
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Oxygen-Sans', Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
     background: #fff;
     height: 100vh;
     width: 100vw;
@@ -10,11 +10,13 @@
     position: fixed;
     top: 0;
     left: 0;
+    color: #1e1e1e;
 }
 
 #frontend-editor-root {
     height: 100vh;
     width: 100vw;
+    background: #fff;
 }
 
 /* Hide WordPress admin bar */
@@ -26,16 +28,190 @@ html.wp-toolbar {
     display: none !important;
 }
 
-/* Ensure full screen editor */
+/* Editor Layout */
 .edit-post-layout {
     height: 100vh !important;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
 }
 
 .edit-post-layout__content {
     height: 100vh !important;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
 }
 
-/* Loading fallback styles */
+/* Simple Editor Styles */
+.simple-editor {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+
+/* Title Area - Exact Gutenberg styling */
+.editor-header {
+    padding: 72px 0 0;
+    background: #fff;
+    border-bottom: none;
+    flex-shrink: 0;
+}
+
+.editor-post-title {
+    max-width: 840px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+}
+
+.editor-post-title__input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #1e1e1e;
+    background: transparent;
+    font-family: inherit;
+    padding: 0;
+    margin: 0 0 48px 0;
+    resize: none;
+    box-shadow: none;
+    -webkit-appearance: none;
+}
+
+.editor-post-title__input::placeholder {
+    color: rgba(30, 30, 30, 0.62);
+}
+
+.editor-post-title__input:focus {
+    box-shadow: none;
+    border: none;
+    outline: none;
+}
+
+/* Content Area - Gutenberg native styling */
+.editor-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #fff;
+}
+
+.editor-writing-flow {
+    max-width: 840px;
+    margin: 0 auto;
+    padding: 0 24px 48px;
+    min-height: 60vh;
+}
+
+.editor-content-area {
+    min-height: 500px;
+    outline: none;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #1e1e1e;
+    font-family: inherit;
+    cursor: text;
+}
+
+.editor-content-area:empty::before {
+    content: attr(data-placeholder);
+    color: rgba(30, 30, 30, 0.62);
+    font-style: normal;
+    pointer-events: none;
+    position: absolute;
+}
+
+.editor-content-area:focus {
+    outline: none;
+}
+
+/* Typography - Match Gutenberg blocks */
+.editor-content-area p {
+    margin: 0 0 1em 0;
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.editor-content-area p:last-child {
+    margin-bottom: 0;
+}
+
+.editor-content-area h1,
+.editor-content-area h2,
+.editor-content-area h3,
+.editor-content-area h4,
+.editor-content-area h5,
+.editor-content-area h6 {
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 0.67em 0;
+}
+
+.editor-content-area h1 { font-size: 2.44em; }
+.editor-content-area h2 { font-size: 1.95em; }
+.editor-content-area h3 { font-size: 1.56em; }
+.editor-content-area h4 { font-size: 1.25em; }
+.editor-content-area h5 { font-size: 1em; }
+.editor-content-area h6 { font-size: 0.8em; }
+
+/* Toolbar Styles */
+.editor-toolbar {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 100;
+}
+
+.editor-save-button {
+    background: #007cba;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background-color 0.1s ease-in-out;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.editor-save-button:hover {
+    background: #005a87;
+}
+
+.editor-save-button:focus {
+    outline: 1px solid #007cba;
+    outline-offset: -1px;
+}
+
+/* Scrollbar styling - Gutenberg style */
+.editor-content::-webkit-scrollbar {
+    width: 12px;
+}
+
+.editor-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.editor-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+.editor-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+    background-clip: content-box;
+}
+
+/* Loading state */
 .editor-loading {
     display: flex;
     flex-direction: column;
@@ -43,11 +219,58 @@ html.wp-toolbar {
     justify-content: center;
     height: 100vh;
     color: #666;
+    background: #fff;
 }
 
 .editor-loading p {
     margin: 0.5rem 0;
     font-size: 1rem;
+}
+
+/* Text selection */
+::selection {
+    background-color: rgba(0, 123, 255, 0.25);
+}
+
+::-moz-selection {
+    background-color: rgba(0, 123, 255, 0.25);
+}
+
+/* Focus within editor */
+.simple-editor:focus-within .editor-post-title__input::placeholder,
+.simple-editor:focus-within .editor-content-area:empty::before {
+    opacity: 0.6;
+}
+
+/* Responsive Design - Match Gutenberg breakpoints */
+@media (max-width: 960px) {
+    .editor-post-title {
+        padding: 0 16px;
+    }
+    
+    .editor-writing-flow {
+        padding: 0 16px 48px;
+    }
+    
+    .editor-post-title__input {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .editor-header {
+        padding-top: 48px;
+    }
+    
+    .editor-post-title__input {
+        font-size: 1.75rem;
+        margin-bottom: 32px;
+    }
+    
+    .editor-toolbar {
+        bottom: 16px;
+        right: 16px;
+    }
 }
 
 // Frontend Gutenberg Editor Styles

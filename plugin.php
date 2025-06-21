@@ -215,7 +215,7 @@ class ContentManager
         // Enqueue our custom styles
         $style_enqueued = wp_enqueue_style(
             'frontend-editor',
-            plugin_dir_url(__FILE__) . 'assets/css/frontend-editor.css',
+            plugin_dir_url(__FILE__) . 'build/style-index.css',
             ['wp-edit-post', 'wp-block-editor', 'wp-components'],
             $asset['version']
         );
