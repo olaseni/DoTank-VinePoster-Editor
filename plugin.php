@@ -175,7 +175,7 @@ class ContentManager
         if ($this->isFrontendEditorEnabled) {
             // Temporarily grant admin capabilities for frontend editor
             add_filter('user_has_cap', [$this, 'grant_temporary_caps'], 10, 3);
-            include plugin_dir_path(__FILE__) . 'frontend-editor.php';
+            include plugin_dir_path(__FILE__) . 'includes/frontend-editor.php';
             exit;
         }
     }

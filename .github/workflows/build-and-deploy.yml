@@ -33,6 +33,7 @@ jobs:
       - name: Copy plugin files to directory
         run: |
           cp plugin.php vine-poster-plugin/
+          cp -r includes vine-poster-plugin/
           cp -r build vine-poster-plugin/
           
       - name: Create plugin zip
