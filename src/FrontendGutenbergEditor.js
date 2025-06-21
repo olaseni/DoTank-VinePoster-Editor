@@ -40,7 +40,7 @@ const FrontendGutenbergEditor = () => {
                 // Start with a paragraph block using createBlock
                 setBlocks([
                     createBlock('core/paragraph', {
-                        content: 'Start writing your content here...'
+                        placeholder: 'Start writing your content here...'
                     })
                 ]);
             }
@@ -51,7 +51,7 @@ const FrontendGutenbergEditor = () => {
             setPostId(0);
             setBlocks([
                 createBlock('core/paragraph', {
-                    content: 'Start writing your content here...'
+                    placeholder: 'Start writing your content here...'
                 })
             ]);
         }

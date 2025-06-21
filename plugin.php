@@ -31,9 +31,7 @@ class ContentManager
         }
         
         add_action('init', [$this, 'register_post_type']);
-        add_action('init', [$this, 'register_meta_fields']);
         add_action('rest_api_init', [$this, 'register_rest_routes']);
-        add_action('rest_api_init', [$this, 'setup_frontend_rest_permissions']);
         add_action('save_post_managed_content', [$this, 'calculate_read_time'], 10, 3);
         add_action('template_redirect', [$this, 'frontend_editor_redirect']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_editor_assets']);
@@ -43,7 +41,6 @@ class ContentManager
         add_action('wp_ajax_nopriv_publish_post_content', [$this, 'ajax_publish_post_content']);
         add_action('wp_ajax_publish_post_content', [$this, 'ajax_publish_post_content']);
         add_filter('upload_mimes', [$this, 'allow_upload_mimes']);
-        add_filter('map_meta_cap', [$this, 'grant_frontend_editor_caps'], 10, 4);
     }
 
     public function register_post_type()
@@ -81,21 +78,6 @@ class ContentManager
 
     public function register_meta_fields()
     {
-
-        $meta_fields = [
-            'content_authors' => ['type' => 'array', 'default' => []],
-            'target_audience' => ['type' => 'string', 'default' => 'group1'],
-            'content_type' => ['type' => 'string', 'default' => 'article'],
-            'estimated_read_time' => ['type' => 'number', 'default' => 10],
-        ];
-
-        /*
-        foreach ($meta_fields as $key => $args) {
-            register_meta('post', $key, array_merge([
-                'show_in_rest' => true,
-                'single' => true,
-            ], $args));
-        }     */
 
         // Authors meta field
         register_post_meta('managed_content', 'content_authors', [
@@ -362,27 +344,9 @@ class ContentManager
         return $mimes;
     }
 
-    public function grant_frontend_editor_caps($caps, $cap, $user_id, $args)
-    {
-        if ($this->isFrontendEditorEnabled) {
-            // Grant media upload capabilities for frontend editor
-            if (in_array($cap, ['upload_files', 'edit_posts', 'publish_posts'])) {
-                return ['exist']; // Minimal capability that everyone has
-            }
-        }
-        return $caps;
-    }
-
     public function is_frontend_editor_request()
     {
         return isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'frontend-editor=1') !== false;
-    }
-
-    public function is_frontend_editor_ajax()
-    {
-        return (defined('DOING_AJAX') && DOING_AJAX && 
-                (isset($_POST['action']) && in_array($_POST['action'], ['save_post_content', 'publish_post_content']))) ||
-               (wp_doing_ajax() && $this->is_frontend_editor_request());
     }
 
     public function grant_temporary_caps($allcaps, $caps, $args)
@@ -395,7 +359,7 @@ class ContentManager
             'publish_posts',
             'read',
             'edit_files',
-            'manage_options', // For media library access
+            'manage_options',
             'unfiltered_html'
         ];
 
@@ -404,49 +368,6 @@ class ContentManager
         }
 
         return $allcaps;
-    }
-
-    public function setup_frontend_rest_permissions()
-    {
-        if ($this->isFrontendEditorEnabled || $this->is_frontend_editor_rest()) {
-            // Override media upload permissions for REST API
-            add_filter('rest_pre_dispatch', [$this, 'enable_rest_for_frontend'], 10, 3);
-            add_filter('user_has_cap', [$this, 'grant_temporary_caps'], 10, 3);
-            
-            // Override specific REST API permission callbacks
-            add_filter('rest_pre_serve_request', [$this, 'override_rest_permissions'], 10, 4);
-            add_filter('rest_media_collection_params', [$this, 'allow_media_uploads'], 10, 1);
-        }
-    }
-
-    public function is_frontend_editor_rest()
-    {
-        return isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'frontend-editor=1') !== false;
-    }
-
-    public function enable_rest_for_frontend($result, $server, $request)
-    {
-        // Allow all REST API requests when frontend editor is active
-        if ($this->isFrontendEditorEnabled || $this->is_frontend_editor_rest()) {
-            // Grant temporary user capabilities
-            add_filter('user_has_cap', [$this, 'grant_temporary_caps'], 10, 3);
-        }
-        return $result;
-    }
-
-    public function override_rest_permissions($served, $result, $request, $server)
-    {
-        // Grant temporary capabilities for any REST request from frontend editor
-        if ($this->isFrontendEditorEnabled || $this->is_frontend_editor_rest()) {
-            add_filter('user_has_cap', [$this, 'grant_temporary_caps'], 10, 3);
-        }
-        return $served;
-    }
-
-    public function allow_media_uploads($params)
-    {
-        // Allow media uploads by modifying parameters
-        return $params;
     }
 }
 
