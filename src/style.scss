@@ -1,10 +1,21 @@
 /* Gutenberg Native Editor Styles */
 
-/* Prevent any scrollbars */
+/* Prevent any scrollbars and reset positioning */
 html, body {
-    overflow: hidden !important;
+    overflow-x: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Reset any WordPress positioning */
+* {
     margin: 0;
     padding: 0;
+}
+
+.frontend-gutenberg-editor * {
     box-sizing: border-box;
 }
 .block-editor-page {
@@ -14,18 +25,22 @@ html, body {
     background: #fff;
     height: 100vh;
     width: 100%;
-    overflow: hidden;
-    position: fixed;
-    top: 0;
-    left: 0;
+    overflow-x: hidden;
     color: #1e1e1e;
+    box-sizing: border-box;
 }
 
 #frontend-editor-root {
     height: 100vh;
     width: 100%;
     background: #fff;
-    overflow: hidden;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    position: relative;
+    left: 0;
+    top: 0;
+    margin: 0;
+    padding: 0;
 }
 
 /* Hide WordPress admin bar */
@@ -390,6 +405,9 @@ html.wp-toolbar {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+    position: relative;
+    left: 0;
+    margin-left: 0;
     
     .frontend-editor-title-section {
         margin-bottom: 24px;
