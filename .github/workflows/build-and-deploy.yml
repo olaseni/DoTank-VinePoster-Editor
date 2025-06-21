@@ -55,7 +55,7 @@ jobs:
           scp plugin.zip ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:public_html/vine-poster-editor/
           
           # Copy index.html file
-          scp index.html ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:public_html/vine-poster-editor/
+          scp index.php ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:public_html/vine-poster-editor/
           
           echo "Files deployed successfully to public_html/vine-poster-editor/"
           echo "Plugin zip: https://${{ secrets.SSH_HOST }}/vine-poster-editor/plugin.zip"
