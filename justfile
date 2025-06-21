@@ -55,7 +55,7 @@ stop:
     @pkill -f "@wp-now/wp-now" || true
 
 blueprint-local:
-    open index.html
+    open index.php
 
 blueprint-remote:
     open https://333608b5aa.nxcli.io/vine-poster-editor/
