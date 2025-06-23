@@ -4,7 +4,27 @@ import { createBlock } from '@wordpress/blocks';
 const EditorSidebar = ({ onInsertBlock, currentIndex = -1 }) => {
     
     const handleInsertBlock = (blockType, attributes = {}) => {
-        const newBlock = createBlock(blockType, attributes);
+        let newBlock;
+        
+        // Handle columns block creation with inner column blocks
+        if (blockType === 'core/columns') {
+            const columnCount = attributes.columns || 2;
+            const innerBlocks = [];
+            
+            // Create the specified number of column blocks
+            for (let i = 0; i < columnCount; i++) {
+                innerBlocks.push(createBlock('core/column', {}, [
+                    createBlock('core/paragraph', { 
+                        placeholder: 'Add content...'
+                    })
+                ]));
+            }
+            
+            newBlock = createBlock(blockType, attributes, innerBlocks);
+        } else {
+            newBlock = createBlock(blockType, attributes);
+        }
+        
         if (onInsertBlock) {
             onInsertBlock(newBlock, currentIndex);
         }
@@ -48,12 +68,20 @@ const EditorSidebar = ({ onInsertBlock, currentIndex = -1 }) => {
             <Panel>
                 <PanelBody title="Columns" initialOpen={true}>
                     <div className="columns-grid">
-                        <div className="column-option">
+                        <div 
+                            className="column-option"
+                            title="Single Column"
+                            onClick={() => handleInsertBlock('core/columns', { columns: 1 })}
+                        >
                             <div className="column-preview single-column">
                                 <div className="column-bar"></div>
                             </div>
                         </div>
-                        <div className="column-option">
+                        <div 
+                            className="column-option"
+                            title="Two Columns"
+                            onClick={() => handleInsertBlock('core/columns', { columns: 2 })}
+                        >
                             <div className="column-preview double-column">
                                 <div className="column-bar"></div>
                                 <div className="column-bar"></div>

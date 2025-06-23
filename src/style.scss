@@ -3,10 +3,220 @@
 
 /* WordPress block styles are loaded via PHP enqueue_style */
 
-/* Minimal block style overrides for frontend editor */
+/* Ensure Gutenberg layout styles are applied properly */
+.wp-block-columns {
+    width: 100%;
+    box-sizing: border-box;
+    
+    &:not(.is-not-stacked-on-mobile) > .wp-block-column {
+        flex-basis: 0;
+        flex-grow: 1;
+    }
+    
+    &.are-vertically-aligned-top {
+        align-items: flex-start;
+    }
+    
+    &.are-vertically-aligned-center {
+        align-items: center;
+    }
+    
+    &.are-vertically-aligned-bottom {
+        align-items: flex-end;
+    }
+}
+
+.wp-block-column {
+    flex-grow: 1;
+    min-width: 0;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Ensure our editor container doesn't constrain block widths */
+.frontend-editor-blocks {
+    .wp-block {
+        max-width: none !important;
+        width: 100%;
+    }
+    
+    .wp-block[data-align="full"] {
+        width: 100vw;
+        max-width: 100vw;
+    }
+    
+    /* Override any Gutenberg editor max-width constraints */
+    .block-editor-block-list__layout {
+        max-width: none !important;
+        
+        .wp-block {
+            max-width: none !important;
+        }
+    }
+    
+    /* Ensure columns use full available width */
+    .wp-block-columns {
+        max-width: none !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+}
+
+/* Core Block Styles - Ensure these are applied */
+
+/* Media Text Block */
+.wp-block-media-text {
+    display: grid;
+    grid-template-rows: auto;
+    align-items: center;
+    grid-template-columns: 50% 1fr;
+    grid-template-areas: "media-text-media media-text-content";
+    
+    &.has-media-on-the-right {
+        grid-template-columns: 1fr 50%;
+        grid-template-areas: "media-text-content media-text-media";
+    }
+    
+    .wp-block-media-text__media {
+        grid-area: media-text-media;
+        margin: 0;
+        
+        img, video {
+            max-width: unset;
+            width: 100%;
+            vertical-align: middle;
+        }
+    }
+    
+    .wp-block-media-text__content {
+        grid-area: media-text-content;
+        padding: 0 8% 0 8%;
+        word-break: break-word;
+        
+        > *:first-child {
+            margin-top: 0;
+        }
+        
+        > *:last-child {
+            margin-bottom: 0;
+        }
+    }
+    
+    &.is-stacked-on-mobile {
+        @media (max-width: 600px) {
+            grid-template-columns: 100%;
+            grid-template-areas: 
+                "media-text-media"
+                "media-text-content";
+                
+            .wp-block-media-text__media {
+                grid-area: media-text-media;
+            }
+            
+            .wp-block-media-text__content {
+                grid-area: media-text-content;
+            }
+        }
+    }
+}
+
+/* Group Block */
+.wp-block-group {
+    box-sizing: border-box;
+    
+    &.is-layout-flow > * {
+        margin-block-start: 0;
+        margin-block-end: 0;
+    }
+    
+    &.is-layout-flow > * + * {
+        margin-block-start: 0.5em;
+    }
+    
+    &.is-layout-flex {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5em;
+        
+        &.is-vertical {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        &.is-content-justification-left {
+            justify-content: flex-start;
+        }
+        
+        &.is-content-justification-center {
+            justify-content: center;
+        }
+        
+        &.is-content-justification-right {
+            justify-content: flex-end;
+        }
+        
+        &.is-content-justification-space-between {
+            justify-content: space-between;
+        }
+    }
+}
+
+/* Image Block */
 .wp-block-image {
+    margin: 0 0 1em 0;
+    
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+    
     &.size-thumbnail img {
         border-radius: 50%; /* Make avatar circular */
+    }
+    
+    &.is-style-rounded img {
+        border-radius: 9999px;
+    }
+    
+    figcaption {
+        color: #555;
+        font-size: 13px;
+        text-align: center;
+    }
+}
+
+/* Button Block */
+.wp-block-button {
+    margin-bottom: 1.5em;
+    
+    .wp-block-button__link {
+        background-color: #32373c;
+        border: none;
+        border-radius: 28px;
+        box-shadow: none;
+        color: #fff;
+        cursor: pointer;
+        display: inline-block;
+        font-size: 18px;
+        padding: 12px 24px;
+        text-align: center;
+        text-decoration: none;
+        overflow-wrap: break-word;
+    }
+}
+
+/* Paragraph Block */
+.wp-block-paragraph {
+    &.has-drop-cap:not(:focus)::first-letter {
+        float: left;
+        font-size: 8.4em;
+        line-height: 0.68;
+        font-weight: 100;
+        margin: 0.05em 0.1em 0 0;
+        text-transform: uppercase;
+        font-style: normal;
     }
 }
 
@@ -460,6 +670,11 @@ html.wp-toolbar {
         overflow-x: hidden;
         box-sizing: border-box;
         position: relative;
+        
+        /* Ensure blocks can use full width minus padding */
+        > * {
+            max-width: calc(100% - 0px); /* Account for any internal constraints */
+        }
         
         .block-editor-block-contextual-toolbar {
             position: sticky;

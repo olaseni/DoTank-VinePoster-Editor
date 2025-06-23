@@ -203,12 +203,12 @@ class ContentManager
             $asset['version'],
             true
         );
-
+        
         // Enqueue our custom styles
         wp_enqueue_style(
             'frontend-editor',
             plugin_dir_url(__FILE__) . 'build/style-index.css',
-            ['wp-edit-post', 'wp-block-editor', 'wp-components', 'wp-block-library', 'wp-block-library-theme', 'wp-components', 'wp-editor'],
+            ['wp-edit-post', 'wp-block-editor', 'wp-components', 'wp-block-library', 'wp-block-library-theme', 'wp-edit-blocks', 'common'],
             $asset['version']
         );
 
