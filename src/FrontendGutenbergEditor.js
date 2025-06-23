@@ -25,6 +25,7 @@ const FrontendGutenbergEditor = () => {
     const [blocks, setBlocks] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
     const [postId, setPostId] = useState(0);
+    const [postTitle, setPostTitle] = useState('');
     
     // Track current insertion index (where new blocks should be inserted)
     const [currentInsertionIndex, setCurrentInsertionIndex] = useState(-1);
@@ -39,7 +40,7 @@ const FrontendGutenbergEditor = () => {
             const blockPopovers = document.querySelectorAll('.components-popover.block-editor-block-popover');
             const optionsPopovers = document.querySelectorAll('.components-popover[data-floating-ui-portal]');
             const allPopovers = document.querySelectorAll('.components-popover');
-            const templateBlocks = document.querySelectorAll('.block-editor-block-list__block:first-child, .block-editor-block-list__block:nth-child(2)');
+            const templateBlocks = document.querySelectorAll('.block-editor-block-list__block:first-child');
             
             templateBlocks.forEach(block => {
                 // Hide options buttons within template blocks
@@ -119,38 +120,40 @@ const FrontendGutenbergEditor = () => {
         if (window.frontendEditorData?.postData && Object.keys(window.frontendEditorData.postData).length > 0) {
             const post = window.frontendEditorData.postData;
             setPostId(post.id || 0);
+            setPostTitle(post.title || '');
             
             // Parse existing content into blocks
             if (post.content) {
                 const parsedBlocks = parse(post.content);
                 
-                // Ensure first two blocks have the proper lock attributes
-                if (parsedBlocks.length >= 2) {
-                    if (parsedBlocks[0].name === 'core/heading') {
-                        parsedBlocks[0].attributes = {
-                            ...parsedBlocks[0].attributes,
-                            lock: { move: true, remove: true }
-                        };
-                    }
-                    if (parsedBlocks[1].name === 'core/paragraph') {
-                        parsedBlocks[1].attributes = {
-                            ...parsedBlocks[1].attributes,
-                            lock: { move: true, remove: true }
-                        };
-                    }
+                // Remove title block if it exists (we'll handle title separately now)
+                const contentBlocks = parsedBlocks.filter(block => 
+                    !(block.name === 'core/heading' && block.attributes?.level === 1)
+                );
+                
+                // Ensure first block (description) has proper lock attributes
+                if (contentBlocks.length >= 1 && contentBlocks[0].name === 'core/paragraph') {
+                    contentBlocks[0].attributes = {
+                        ...contentBlocks[0].attributes,
+                        lock: { move: true, remove: true }
+                    };
                 }
                 
-                setBlocks(parsedBlocks);
+                // If no content blocks, create initial template
+                if (contentBlocks.length === 0) {
+                    setBlocks([
+                        createBlock('core/paragraph', {
+                            placeholder: 'Add short description ...',
+                            lock: { move: true, remove: true },
+                            isTemplateBlock: true
+                        })
+                    ]);
+                } else {
+                    setBlocks(contentBlocks);
+                }
             } else {
-                // Create initial template blocks manually for new posts
+                // Create initial template block for new posts
                 setBlocks([
-                    createBlock('core/heading', {
-                        content: post.title || '',
-                        level: 1,
-                        placeholder: 'Add title ...',
-                        lock: { move: true, remove: true },
-                        isTemplateBlock: true
-                    }),
                     createBlock('core/paragraph', {
                         placeholder: 'Add short description ...',
                         lock: { move: true, remove: true },
@@ -159,16 +162,10 @@ const FrontendGutenbergEditor = () => {
                 ]);
             }
         } else {
-            // No post data - create initial template blocks
+            // No post data - create initial template
             setPostId(0);
+            setPostTitle('');
             setBlocks([
-                createBlock('core/heading', {
-                    content: '',
-                    level: 1,
-                    placeholder: 'Add title ...',
-                    lock: { move: true, remove: true },
-                    isTemplateBlock: true
-                }),
                 createBlock('core/paragraph', {
                     placeholder: 'Add short description ...',
                     lock: { move: true, remove: true },
@@ -184,9 +181,8 @@ const FrontendGutenbergEditor = () => {
         const content = serialize(blocks);
         const action = status === 'publish' ? 'publish_post_content' : 'save_post_content';
         
-        // Extract title from the first heading block
-        const titleBlock = blocks.find(block => block.name === 'core/heading' && block.attributes?.level === 1);
-        const title = titleBlock?.attributes?.content || 'Untitled Post';
+        // Use the dedicated title state
+        const title = postTitle.trim() || 'Untitled Post';
         
         // Extract excerpt from the first paragraph block
         const excerptBlock = blocks.find(block => block.name === 'core/paragraph' && block.attributes?.content);
@@ -251,8 +247,8 @@ const FrontendGutenbergEditor = () => {
     // Function to insert a new block at the current position
     const handleInsertBlock = (newBlock, insertIndex = -1) => {
         const updatedBlocks = [...blocks];
-        // Ensure we don't insert before the locked template blocks (first 2)
-        const minIndex = 2;
+        // Ensure we don't insert before the locked template block (first 1)
+        const minIndex = 1;
         const index = insertIndex >= 0 ? Math.max(insertIndex, minIndex) : blocks.length;
         updatedBlocks.splice(index, 0, newBlock);
         setBlocks(updatedBlocks);
@@ -278,6 +274,21 @@ const FrontendGutenbergEditor = () => {
             
                     <div className="frontend-editor-content">
                         <div className="frontend-editor-blocks">
+                            {/* Dedicated Title Input */}
+                            <div className="post-title-section">
+                                <textarea
+                                    className="post-title-input"
+                                    placeholder="Add title..."
+                                    value={postTitle}
+                                    onChange={(e) => setPostTitle(e.target.value)}
+                                    rows={1}
+                                    onInput={(e) => {
+                                        e.target.style.height = 'auto';
+                                        e.target.style.height = e.target.scrollHeight + 'px';
+                                    }}
+                                />
+                            </div>
+                            
                             <BlockEditorProvider
                                     value={blocks}
                                     onInput={setBlocks}
@@ -293,11 +304,6 @@ const FrontendGutenbergEditor = () => {
                                         canUserUseUnfilteredHTML: true,
                                         __experimentalCanUserUseUnfilteredHTML: true,
                                         template: [
-                                            ['core/heading', { 
-                                                level: 1, 
-                                                placeholder: 'Add title ...',
-                                                lock: { move: true, remove: true }
-                                            }],
                                             ['core/paragraph', { 
                                                 placeholder: 'Add short description ...',
                                                 lock: { move: true, remove: true }

@@ -3,9 +3,8 @@
 
 /* Template Block Restrictions */
 .frontend-gutenberg-editor {
-    /* Hide all floating toolbars for first two blocks */
-    .block-editor-block-list__block:first-child,
-    .block-editor-block-list__block:nth-child(2) {
+    /* Hide all floating toolbars for first block (description) */
+    .block-editor-block-list__block:first-child {
         /* Hide block toolbar */
         .block-editor-block-toolbar {
             display: none !important;
@@ -76,9 +75,8 @@
         }
     }
     
-    /* Hide floating popover toolbars globally when first two blocks are selected */
-    &:has(.block-editor-block-list__block:first-child.is-selected) .components-popover.block-editor-block-toolbar__popover,
-    &:has(.block-editor-block-list__block:nth-child(2).is-selected) .components-popover.block-editor-block-toolbar__popover {
+    /* Hide floating popover toolbars globally when first block is selected */
+    &:has(.block-editor-block-list__block:first-child.is-selected) .components-popover.block-editor-block-toolbar__popover {
         display: none !important;
     }
 }
@@ -90,47 +88,39 @@
     }
 }
 
-/* Hide options/settings popovers only when template blocks are selected */
-.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover.block-editor-block-settings-menu__popover,
-.frontend-gutenberg-editor .block-editor-block-list__block:nth-child(2).is-selected ~ * .components-popover.block-editor-block-settings-menu__popover {
+/* Hide options/settings popovers only when template block is selected */
+.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover.block-editor-block-settings-menu__popover {
     display: none !important;
 }
 
-/* Hide block popovers only when template blocks are selected */
-.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover.block-editor-block-popover,
-.frontend-gutenberg-editor .block-editor-block-list__block:nth-child(2).is-selected ~ * .components-popover.block-editor-block-popover {
+/* Hide block popovers only when template block is selected */
+.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover.block-editor-block-popover {
     display: none !important;
 }
 
-/* Hide any floating popovers when template blocks are selected */
-.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover,
-.frontend-gutenberg-editor .block-editor-block-list__block:nth-child(2).is-selected ~ * .components-popover {
+/* Hide any floating popovers when template block is selected */
+.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover {
     display: none !important;
 }
 
-/* Hide floating popovers only when template blocks are selected */
-.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover[data-floating-ui-portal],
-.frontend-gutenberg-editor .block-editor-block-list__block:nth-child(2).is-selected ~ * .components-popover[data-floating-ui-portal] {
+/* Hide floating popovers only when template block is selected */
+.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover[data-floating-ui-portal] {
     display: none !important;
 }
 
-/* Hide options dropdown only when template blocks are selected */
-.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-dropdown-menu__popover,
-.frontend-gutenberg-editor .block-editor-block-list__block:nth-child(2).is-selected ~ * .components-dropdown-menu__popover {
+/* Hide options dropdown only when template block is selected */
+.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-dropdown-menu__popover {
     display: none !important;
 }
 
-/* Hide block settings dropdown only for template blocks */
-.frontend-gutenberg-editor .block-editor-block-list__block:first-child .block-editor-block-settings-menu .components-dropdown,
-.frontend-gutenberg-editor .block-editor-block-list__block:nth-child(2) .block-editor-block-settings-menu .components-dropdown {
+/* Hide block settings dropdown only for template block */
+.frontend-gutenberg-editor .block-editor-block-list__block:first-child .block-editor-block-settings-menu .components-dropdown {
     display: none !important;
 }
 
-/* Hide all floating toolbars when template blocks are focused */
-.frontend-gutenberg-editor .wp-block[data-type="core/heading"]:first-child:focus,
-.frontend-gutenberg-editor .wp-block[data-type="core/paragraph"]:nth-child(2):focus,
-.frontend-gutenberg-editor .wp-block[data-type="core/heading"]:first-child.is-selected,
-.frontend-gutenberg-editor .wp-block[data-type="core/paragraph"]:nth-child(2).is-selected {
+/* Hide all floating toolbars when template block is focused */
+.frontend-gutenberg-editor .wp-block[data-type="core/paragraph"]:first-child:focus,
+.frontend-gutenberg-editor .wp-block[data-type="core/paragraph"]:first-child.is-selected {
     ~ * .components-popover.block-editor-block-toolbar__popover {
         display: none !important;
     }
@@ -143,9 +133,8 @@
     display: none !important;
 }
 
-/* Hide advanced panel for template blocks */
-.frontend-gutenberg-editor .wp-block:first-child.is-selected ~ * .block-editor-block-inspector .components-panel__body:last-child,
-.frontend-gutenberg-editor .wp-block:nth-child(2).is-selected ~ * .block-editor-block-inspector .components-panel__body:last-child {
+/* Hide advanced panel for template block */
+.frontend-gutenberg-editor .wp-block:first-child.is-selected ~ * .block-editor-block-inspector .components-panel__body:last-child {
     display: none !important;
 }
 
@@ -546,6 +535,42 @@ html.wp-toolbar {
 }
 
 .frontend-editor-content {
+    
+    .post-title-section {
+        padding: 32px 24px 0 24px;
+        background: white;
+        border-bottom: 1px solid #f0f0f0;
+        
+        .post-title-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.4;
+            color: #1e1e1e;
+            background: transparent;
+            font-family: inherit;
+            padding: 0;
+            margin: 0 0 32px 0;
+            resize: none;
+            box-shadow: none;
+            -webkit-appearance: none;
+            min-height: 3.5rem;
+            overflow: hidden;
+            
+            &::placeholder {
+                color: rgba(30, 30, 30, 0.62);
+                font-weight: 700;
+            }
+            
+            &:focus {
+                box-shadow: none;
+                border: none;
+                outline: none;
+            }
+        }
+    }
     
     .frontend-editor-blocks {
         flex: 1;
