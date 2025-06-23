@@ -49,47 +49,16 @@ const FrontendGutenbergEditor = () => {
                     !(block.name === 'core/heading' && block.attributes?.level === 1)
                 );
                 
-                // Ensure first block (description) has proper lock attributes
-                if (contentBlocks.length >= 1 && contentBlocks[0].name === 'core/paragraph') {
-                    contentBlocks[0].attributes = {
-                        ...contentBlocks[0].attributes,
-                        lock: { move: true, remove: true }
-                    };
-                }
-                
-                // If no content blocks, create initial template
-                if (contentBlocks.length === 0) {
-                    setBlocks([
-                        createBlock('core/paragraph', {
-                            placeholder: 'Add short description ...',
-                            lock: { move: true, remove: true },
-                            isTemplateBlock: true
-                        })
-                    ]);
-                } else {
-                    setBlocks(contentBlocks);
-                }
+                setBlocks(contentBlocks);
             } else {
-                // Create initial template block for new posts
-                setBlocks([
-                    createBlock('core/paragraph', {
-                        placeholder: 'Add short description ...',
-                        lock: { move: true, remove: true },
-                        isTemplateBlock: true
-                    })
-                ]);
+                // Start with empty blocks for new posts
+                setBlocks([]);
             }
         } else {
-            // No post data - create initial template
+            // No post data - start with empty blocks
             setPostId(0);
             setPostTitle('');
-            setBlocks([
-                createBlock('core/paragraph', {
-                    placeholder: 'Add short description ...',
-                    lock: { move: true, remove: true },
-                    isTemplateBlock: true
-                })
-            ]);
+            setBlocks([]);
         }
     }, []);
 
@@ -165,9 +134,7 @@ const FrontendGutenbergEditor = () => {
     // Function to insert a new block at the current position
     const handleInsertBlock = (newBlock, insertIndex = -1) => {
         const updatedBlocks = [...blocks];
-        // Ensure we don't insert before the locked template block (first 1)
-        const minIndex = 1;
-        const index = insertIndex >= 0 ? Math.max(insertIndex, minIndex) : blocks.length;
+        const index = insertIndex >= 0 ? insertIndex : blocks.length;
         updatedBlocks.splice(index, 0, newBlock);
         setBlocks(updatedBlocks);
         
@@ -221,13 +188,6 @@ const FrontendGutenbergEditor = () => {
                                         hasReducedUI: false,
                                         canUserUseUnfilteredHTML: true,
                                         __experimentalCanUserUseUnfilteredHTML: true,
-                                        template: [
-                                            ['core/paragraph', { 
-                                                placeholder: 'Add short description ...',
-                                                lock: { move: true, remove: true }
-                                            }]
-                                        ],
-                                        templateLock: 'insert',
                                         mediaUpload: ({ filesList, onFileChange, allowedTypes, onError }) => {
                                             console.log('Media upload called with:', { filesList, allowedTypes });
                                             console.log('Frontend editor data:', window.frontendEditorData);
