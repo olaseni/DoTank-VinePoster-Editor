@@ -396,6 +396,7 @@ html.wp-toolbar {
     overflow: hidden;
     min-width: 0;
     background: #fafafa;
+    margin-right: 280px; /* Account for sidebar width */
 }
 
 .frontend-editor-content {
@@ -565,9 +566,22 @@ html.wp-toolbar {
 }
 
 // Responsive Design
+@media (max-width: 1280px) {
+    .frontend-editor-content {
+        margin-right: 260px; /* Match smaller sidebar width */
+    }
+}
+
+@media (max-width: 1024px) {
+    .frontend-editor-content {
+        margin-right: 240px; /* Match smallest sidebar width */
+    }
+}
+
 @media (max-width: 768px) {
     .frontend-editor-content {
         flex-direction: column;
+        margin-right: 0; /* No sidebar margin on mobile */
     }
     
     .frontend-editor-sidebar {
