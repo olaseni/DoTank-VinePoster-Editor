@@ -269,9 +269,8 @@ const FrontendGutenbergEditor = () => {
                 <div className="frontend-gutenberg-editor has-sidebar">
             
                     <div className="frontend-editor-content">
-                        <div className="frontend-editor-main">
-                            <div className="frontend-editor-blocks">
-                                <BlockEditorProvider
+                        <div className="frontend-editor-blocks">
+                            <BlockEditorProvider
                                     value={blocks}
                                     onInput={setBlocks}
                                     onChange={(newBlocks) => {
@@ -388,7 +387,6 @@ const FrontendGutenbergEditor = () => {
                                         </WritingFlow>
                                     </BlockTools>
                                 </BlockEditorProvider>
-                            </div>
                         </div>
                     </div>
 
