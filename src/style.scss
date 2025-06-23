@@ -1,142 +1,6 @@
 /* Gutenberg Native Editor Styles */
 @import './components/EditorSidebar.scss';
 
-/* Template Block Restrictions */
-.frontend-gutenberg-editor {
-    /* Hide all floating toolbars for first block (description) */
-    .block-editor-block-list__block:first-child {
-        /* Hide block toolbar */
-        .block-editor-block-toolbar {
-            display: none !important;
-        }
-        
-        /* Hide block mover controls */
-        .block-editor-block-mover {
-            display: none !important;
-        }
-        
-        /* Hide block settings menu */
-        .block-editor-block-settings-menu {
-            display: none !important;
-        }
-        
-        /* Hide block settings menu button */
-        .block-editor-block-settings-menu__trigger {
-            display: none !important;
-        }
-        
-        /* Hide options button */
-        .block-editor-block-settings-menu__toggle {
-            display: none !important;
-        }
-        
-        /* Hide any button with options */
-        button[aria-label*="Options"],
-        button[aria-label*="More options"],
-        button[aria-label*="Block options"] {
-            display: none !important;
-        }
-        
-        /* Hide format toolbar */
-        .block-editor-format-toolbar {
-            display: none !important;
-        }
-        
-        /* Remove hover outline and controls */
-        &:hover {
-            outline: none !important;
-            
-            .block-editor-block-toolbar,
-            .block-editor-block-mover,
-            .block-editor-block-settings-menu,
-            .block-editor-block-settings-menu__trigger,
-            .block-editor-block-settings-menu__toggle,
-            .components-toolbar,
-            .block-editor-block-contextual-toolbar {
-                display: none !important;
-            }
-        }
-        
-        /* Hide selection outline */
-        &.is-selected {
-            outline: none !important;
-            box-shadow: none !important;
-            
-            .block-editor-block-settings-menu,
-            .block-editor-block-settings-menu__trigger,
-            .block-editor-block-settings-menu__toggle {
-                display: none !important;
-            }
-        }
-        
-        /* Disable block selection handles */
-        .block-editor-block-list__block-selection-button {
-            display: none !important;
-        }
-    }
-    
-    /* Hide floating popover toolbars globally when first block is selected */
-    &:has(.block-editor-block-list__block:first-child.is-selected) .components-popover.block-editor-block-toolbar__popover {
-        display: none !important;
-    }
-}
-
-/* More aggressive hiding of floating toolbars and options popovers */
-.components-popover.block-editor-block-toolbar__popover {
-    &[data-floating-ui-portal] {
-        display: none !important;
-    }
-}
-
-/* Hide options/settings popovers only when template block is selected */
-.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover.block-editor-block-settings-menu__popover {
-    display: none !important;
-}
-
-/* Hide block popovers only when template block is selected */
-.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover.block-editor-block-popover {
-    display: none !important;
-}
-
-/* Hide any floating popovers when template block is selected */
-.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover {
-    display: none !important;
-}
-
-/* Hide floating popovers only when template block is selected */
-.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover[data-floating-ui-portal] {
-    display: none !important;
-}
-
-/* Hide options dropdown only when template block is selected */
-.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-dropdown-menu__popover {
-    display: none !important;
-}
-
-/* Hide block settings dropdown only for template block */
-.frontend-gutenberg-editor .block-editor-block-list__block:first-child .block-editor-block-settings-menu .components-dropdown {
-    display: none !important;
-}
-
-/* Hide all floating toolbars when template block is focused */
-.frontend-gutenberg-editor .wp-block[data-type="core/paragraph"]:first-child:focus,
-.frontend-gutenberg-editor .wp-block[data-type="core/paragraph"]:first-child.is-selected {
-    ~ * .components-popover.block-editor-block-toolbar__popover {
-        display: none !important;
-    }
-}
-
-/* Hide formatting controls in sidebar for template blocks */
-.block-editor-block-inspector .components-panel:has(.components-base-control__label:contains("Typography")),
-.block-editor-block-inspector .components-panel:has(.components-base-control__label:contains("Color")),
-.block-editor-block-inspector .components-panel:has(.components-base-control__label:contains("Dimensions")) {
-    display: none !important;
-}
-
-/* Hide advanced panel for template block */
-.frontend-gutenberg-editor .wp-block:first-child.is-selected ~ * .block-editor-block-inspector .components-panel__body:last-child {
-    display: none !important;
-}
 
 /* Prevent any scrollbars and reset positioning */
 html, body {
@@ -537,7 +401,6 @@ html.wp-toolbar {
 .frontend-editor-content {
     
     .post-title-section {
-        padding: 32px 24px 0 24px;
         background: white;
         border-bottom: 1px solid #f0f0f0;
         
@@ -552,7 +415,6 @@ html.wp-toolbar {
             background: transparent;
             font-family: inherit;
             padding: 0;
-            margin: 0 0 32px 0;
             resize: none;
             box-shadow: none;
             -webkit-appearance: none;
@@ -639,8 +501,6 @@ html.wp-toolbar {
     display: flex;
     gap: 12px;
     padding: 16px 24px;
-    border-top: 1px solid #e0e0e0;
-    background: #f8f9fa;
     justify-content: flex-start;
     
     .save-draft-btn {
