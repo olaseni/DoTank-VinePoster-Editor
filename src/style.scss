@@ -21,6 +21,23 @@
             display: none !important;
         }
         
+        /* Hide block settings menu button */
+        .block-editor-block-settings-menu__trigger {
+            display: none !important;
+        }
+        
+        /* Hide options button */
+        .block-editor-block-settings-menu__toggle {
+            display: none !important;
+        }
+        
+        /* Hide any button with options */
+        button[aria-label*="Options"],
+        button[aria-label*="More options"],
+        button[aria-label*="Block options"] {
+            display: none !important;
+        }
+        
         /* Hide format toolbar */
         .block-editor-format-toolbar {
             display: none !important;
@@ -33,6 +50,8 @@
             .block-editor-block-toolbar,
             .block-editor-block-mover,
             .block-editor-block-settings-menu,
+            .block-editor-block-settings-menu__trigger,
+            .block-editor-block-settings-menu__toggle,
             .components-toolbar,
             .block-editor-block-contextual-toolbar {
                 display: none !important;
@@ -43,6 +62,12 @@
         &.is-selected {
             outline: none !important;
             box-shadow: none !important;
+            
+            .block-editor-block-settings-menu,
+            .block-editor-block-settings-menu__trigger,
+            .block-editor-block-settings-menu__toggle {
+                display: none !important;
+            }
         }
         
         /* Disable block selection handles */
@@ -58,11 +83,47 @@
     }
 }
 
-/* More aggressive hiding of floating toolbars */
+/* More aggressive hiding of floating toolbars and options popovers */
 .components-popover.block-editor-block-toolbar__popover {
     &[data-floating-ui-portal] {
         display: none !important;
     }
+}
+
+/* Hide options/settings popovers only when template blocks are selected */
+.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover.block-editor-block-settings-menu__popover,
+.frontend-gutenberg-editor .block-editor-block-list__block:nth-child(2).is-selected ~ * .components-popover.block-editor-block-settings-menu__popover {
+    display: none !important;
+}
+
+/* Hide block popovers only when template blocks are selected */
+.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover.block-editor-block-popover,
+.frontend-gutenberg-editor .block-editor-block-list__block:nth-child(2).is-selected ~ * .components-popover.block-editor-block-popover {
+    display: none !important;
+}
+
+/* Hide any floating popovers when template blocks are selected */
+.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover,
+.frontend-gutenberg-editor .block-editor-block-list__block:nth-child(2).is-selected ~ * .components-popover {
+    display: none !important;
+}
+
+/* Hide floating popovers only when template blocks are selected */
+.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-popover[data-floating-ui-portal],
+.frontend-gutenberg-editor .block-editor-block-list__block:nth-child(2).is-selected ~ * .components-popover[data-floating-ui-portal] {
+    display: none !important;
+}
+
+/* Hide options dropdown only when template blocks are selected */
+.frontend-gutenberg-editor .block-editor-block-list__block:first-child.is-selected ~ * .components-dropdown-menu__popover,
+.frontend-gutenberg-editor .block-editor-block-list__block:nth-child(2).is-selected ~ * .components-dropdown-menu__popover {
+    display: none !important;
+}
+
+/* Hide block settings dropdown only for template blocks */
+.frontend-gutenberg-editor .block-editor-block-list__block:first-child .block-editor-block-settings-menu .components-dropdown,
+.frontend-gutenberg-editor .block-editor-block-list__block:nth-child(2) .block-editor-block-settings-menu .components-dropdown {
+    display: none !important;
 }
 
 /* Hide all floating toolbars when template blocks are focused */

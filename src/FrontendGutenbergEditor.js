@@ -29,54 +29,62 @@ const FrontendGutenbergEditor = () => {
     // Track current insertion index (where new blocks should be inserted)
     const [currentInsertionIndex, setCurrentInsertionIndex] = useState(-1);
 
-    // Add filter to disable block controls for template blocks
+    // Hide floating toolbars and options popovers specifically for template blocks only
     useEffect(() => {
-        const disableBlockControls = (settings, name) => {
-            // Check if this is one of our template blocks
-            if (name === 'core/heading' || name === 'core/paragraph') {
-                return {
-                    ...settings,
-                    supports: {
-                        ...settings.supports,
-                        // Disable formatting toolbar
-                        __experimentalToolbar: false,
-                        // Disable block controls
-                        inserter: false,
-                        multiple: false,
-                        reusable: false,
-                        // Disable text formatting
-                        formatting: false,
-                        // Disable styling options
-                        color: false,
-                        fontSize: false,
-                        anchor: false,
-                        align: false,
-                        alignWide: false,
-                        className: false,
-                        customClassName: false,
-                        html: false,
-                        dropCap: false
-                    }
-                };
-            }
-            return settings;
-        };
 
-        addFilter(
-            'blocks.registerBlockType',
-            'vine-poster/disable-template-block-controls',
-            disableBlockControls
-        );
-
-        // Hide floating toolbars for template blocks
+        // Hide floating toolbars and options popovers specifically for the first two template blocks only
         const hideFloatingToolbars = () => {
-            const popovers = document.querySelectorAll('.components-popover.block-editor-block-toolbar__popover');
+            const toolbarPopovers = document.querySelectorAll('.components-popover.block-editor-block-toolbar__popover');
+            const settingsPopovers = document.querySelectorAll('.components-popover.block-editor-block-settings-menu__popover');
+            const blockPopovers = document.querySelectorAll('.components-popover.block-editor-block-popover');
+            const optionsPopovers = document.querySelectorAll('.components-popover[data-floating-ui-portal]');
+            const allPopovers = document.querySelectorAll('.components-popover');
             const templateBlocks = document.querySelectorAll('.block-editor-block-list__block:first-child, .block-editor-block-list__block:nth-child(2)');
             
             templateBlocks.forEach(block => {
+                // Hide options buttons within template blocks
+                const optionsButtons = block.querySelectorAll([
+                    '.block-editor-block-settings-menu__trigger',
+                    '.block-editor-block-settings-menu__toggle',
+                    'button[aria-label*="Options"]',
+                    'button[aria-label*="More options"]',
+                    'button[aria-label*="Block options"]',
+                    'button[aria-expanded]'
+                ].join(', '));
+                
+                optionsButtons.forEach(button => {
+                    button.style.display = 'none';
+                    button.disabled = true;
+                });
+                
                 if (block.classList.contains('is-selected')) {
-                    popovers.forEach(popover => {
+                    // Hide toolbar popovers
+                    toolbarPopovers.forEach(popover => {
                         popover.style.display = 'none';
+                    });
+                    
+                    // Hide settings/options popovers
+                    settingsPopovers.forEach(popover => {
+                        popover.style.display = 'none';
+                    });
+                    
+                    // Hide block popovers
+                    blockPopovers.forEach(popover => {
+                        popover.style.display = 'none';
+                    });
+                    
+                    // Hide any floating popovers
+                    optionsPopovers.forEach(popover => {
+                        popover.style.display = 'none';
+                    });
+                    
+                    // Hide all popovers when template blocks are selected
+                    allPopovers.forEach(popover => {
+                        if (popover.classList.contains('block-editor-block-toolbar__popover') ||
+                            popover.classList.contains('block-editor-block-settings-menu__popover') ||
+                            popover.classList.contains('block-editor-block-popover')) {
+                            popover.style.display = 'none';
+                        }
                     });
                 }
             });
@@ -296,40 +304,6 @@ const FrontendGutenbergEditor = () => {
                                             }]
                                         ],
                                         templateLock: 'insert',
-                                        // Custom block type settings to disable formatting and controls
-                                        __experimentalBlockTypeSettings: {
-                                            'core/heading': {
-                                                supports: {
-                                                    formatting: false,
-                                                    color: false,
-                                                    fontSize: false,
-                                                    anchor: false,
-                                                    align: false,
-                                                    alignWide: false,
-                                                    className: false,
-                                                    customClassName: false,
-                                                    html: false,
-                                                    inserter: false,
-                                                    multiple: false,
-                                                    reusable: false
-                                                }
-                                            },
-                                            'core/paragraph': {
-                                                supports: {
-                                                    formatting: false,
-                                                    color: false,
-                                                    fontSize: false,
-                                                    anchor: false,
-                                                    align: false,
-                                                    alignWide: false,
-                                                    className: false,
-                                                    customClassName: false,
-                                                    html: false,
-                                                    inserter: false,
-                                                    dropCap: false
-                                                }
-                                            }
-                                        },
                                         mediaUpload: ({ filesList, onFileChange, allowedTypes, onError }) => {
                                             console.log('Media upload called with:', { filesList, allowedTypes });
                                             console.log('Frontend editor data:', window.frontendEditorData);
