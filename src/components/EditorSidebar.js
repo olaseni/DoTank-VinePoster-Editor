@@ -44,9 +44,9 @@ const EditorSidebar = ({ onInsertBlock, currentIndex = -1 }) => {
                 </PanelBody>
             </Panel>
 
-            {/* Columns Section */}
-            <Panel className="sidebar-panel">
-                <PanelBody title="COLUMNS" initialOpen={true}>
+            {/* All sections in one Panel for proper Gutenberg collapsible behavior */}
+            <Panel>
+                <PanelBody title="Columns" initialOpen={true}>
                     <div className="columns-grid">
                         <div className="column-option">
                             <div className="column-preview single-column">
@@ -61,11 +61,8 @@ const EditorSidebar = ({ onInsertBlock, currentIndex = -1 }) => {
                         </div>
                     </div>
                 </PanelBody>
-            </Panel>
 
-            {/* Blocks Section */}
-            <Panel className="sidebar-panel">
-                <PanelBody title="BLOCKS" initialOpen={true}>
+                <PanelBody title="Blocks" initialOpen={true}>
                     <div className="blocks-grid">
                         <div 
                             className="block-option" 
@@ -111,13 +108,9 @@ const EditorSidebar = ({ onInsertBlock, currentIndex = -1 }) => {
                             </div>
                         </div>
                     </div>
-                    <div className="blocks-divider"></div>
                 </PanelBody>
-            </Panel>
 
-            {/* Featured Image Section */}
-            <Panel className="sidebar-panel">
-                <PanelBody title="Featured Image" initialOpen={true}>
+                <PanelBody title="Featured Image" initialOpen={false}>
                     <div className="featured-image-container">
                         <div className="featured-image-placeholder">
                             <div className="image-placeholder-icon">
@@ -135,11 +128,8 @@ const EditorSidebar = ({ onInsertBlock, currentIndex = -1 }) => {
                         </Button>
                     </div>
                 </PanelBody>
-            </Panel>
 
-            {/* Tags Section */}
-            <Panel className="sidebar-panel">
-                <PanelBody title="Tags" initialOpen={true}>
+                <PanelBody title="Tags" initialOpen={false}>
                     <div className="tags-container">
                         <div className="tag-buttons">
                             <Button 

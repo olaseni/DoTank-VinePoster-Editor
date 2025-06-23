@@ -12,34 +12,17 @@
     z-index: 100;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     
-    // Sidebar Header with Preview and Settings buttons (now inherits Panel styles)
+    // Sidebar Header with Preview and Settings buttons (minimal custom styling)
     .sidebar-header {
         display: flex;
-        gap: 12px;
+        gap: 8px;
         justify-content: flex-end;
         align-items: center;
         
         .preview-button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-weight: 500;
-            font-size: 12px;
             display: flex;
             align-items: center;
             gap: 6px;
-            max-width: fit-content;
-            
-            &:hover:not(:disabled) {
-                background: #45a049;
-            }
-            
-            &:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
-            }
             
             svg {
                 fill: currentColor;
@@ -48,27 +31,9 @@
         }
         
         .settings-button {
-            background: #f0f0f0;
-            color: #666;
-            border: 1px solid #d0d0d0;
-            padding: 8px;
-            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 32px;
-            min-height: 32px;
-            
-            &:hover:not(:disabled) {
-                background: #e8e8e8;
-                border-color: #bbb;
-                color: #555;
-            }
-            
-            &:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
-            }
             
             svg {
                 fill: currentColor;
@@ -76,41 +41,20 @@
         }
     }
 
-    // Panel styling
-    .sidebar-panel {
-        margin: 0;
-        border: none;
-        box-shadow: none;
+    // Let Gutenberg native panel styling handle the triggers
+    .components-panel {
         background: transparent;
 
         .components-panel__body {
-            border: none;
-            margin: 0;
-            padding: 16px 20px;
             border-bottom: 1px solid #d0e8d0;
 
             &:last-child {
                 border-bottom: none;
             }
-
-            .components-panel__body-title {
-                font-size: 11px;
-                font-weight: 600;
-                color: #666;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                margin-bottom: 12px;
-                
-                .components-button {
-                    font-size: 11px;
-                    font-weight: 600;
-                    color: #666;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                    padding: 0;
-                    height: auto;
-                    min-height: auto;
-                }
+            
+            // Only style the content areas, let titles be native
+            .components-panel__body-content {
+                padding: 16px 20px;
             }
         }
     }
@@ -119,7 +63,6 @@
     .columns-grid {
         display: flex;
         gap: 12px;
-        margin-top: 8px;
     }
 
     .column-option {
@@ -167,7 +110,6 @@
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 8px;
-        margin-top: 8px;
     }
 
     .block-option {
@@ -215,17 +157,8 @@
         }
     }
 
-    .blocks-divider {
-        height: 1px;
-        background: #d0e8d0;
-        margin: 16px 0 0 0;
-    }
 
     // Featured Image Section
-    .featured-image-container {
-        margin-top: 8px;
-    }
-
     .featured-image-placeholder {
         width: 100%;
         height: 120px;
@@ -261,11 +194,6 @@
             border-color: #4caf50;
             color: #4caf50;
         }
-    }
-
-    // Tags Section
-    .tags-container {
-        margin-top: 8px;
     }
 
     .tag-buttons {
