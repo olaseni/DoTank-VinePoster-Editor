@@ -620,14 +620,14 @@ html.wp-toolbar {
     
     .save-draft-btn {
         background: white;
-        color: #4CAF50;
-        border: 1px solid #4CAF50;
+        color: #0073aa;
+        border: 1px solid #0073aa;
         padding: 12px 24px;
         border-radius: 4px;
         font-weight: 500;
         
         &:hover:not(:disabled) {
-            background: #f0f8f0;
+            background: #f0f6fc;
         }
         
         &:disabled {
@@ -637,7 +637,7 @@ html.wp-toolbar {
     }
     
     .publish-btn {
-        background: #4CAF50;
+        background: #0073aa;
         color: white;
         border: none;
         padding: 12px 24px;
@@ -645,7 +645,7 @@ html.wp-toolbar {
         font-weight: 500;
         
         &:hover:not(:disabled) {
-            background: #45a049;
+            background: #005a87;
         }
         
         &:disabled {
