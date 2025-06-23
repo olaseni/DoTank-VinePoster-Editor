@@ -30,6 +30,70 @@ const FrontendGutenbergEditor = () => {
     // Track current insertion index (where new blocks should be inserted)
     const [currentInsertionIndex, setCurrentInsertionIndex] = useState(-1);
 
+    // Create initial template based on prototype
+    const createInitialTemplate = () => {
+        return [
+            // Description paragraph
+            createBlock('core/paragraph', {
+                content: '',
+                placeholder: 'A Short Description',
+                fontSize: 'medium'
+            }),
+            
+            // Author section using group block
+            createBlock('core/group', {
+                layout: { type: 'flex', orientation: 'horizontal' }
+            }, [
+                createBlock('core/image', {
+                    url: '',
+                    alt: 'Author Avatar',
+                    width: 50,
+                    height: 50,
+                    sizeSlug: 'thumbnail'
+                }),
+                createBlock('core/paragraph', {
+                    content: '',
+                    placeholder: 'Author Name'
+                })
+            ]),
+            
+            // Main content area with media and text
+            createBlock('core/media-text', {
+                mediaPosition: 'left',
+                mediaType: 'image',
+                imageFill: false,
+                focalPoint: { x: 0.5, y: 0.5 }
+            }, [
+                createBlock('core/paragraph', {
+                    content: '',
+                    placeholder: 'Some more content can come in here'
+                }),
+                createBlock('core/paragraph', {
+                    content: '',
+                    placeholder: 'Even more content goes in here'
+                })
+            ]),
+            
+            // Two-column layout at bottom
+            createBlock('core/columns', {
+                columns: 2
+            }, [
+                createBlock('core/column', {}, [
+                    createBlock('core/paragraph', {
+                        content: '',
+                        placeholder: 'This content fits in a column'
+                    })
+                ]),
+                createBlock('core/column', {}, [
+                    createBlock('core/paragraph', {
+                        content: '',
+                        placeholder: 'This content fits in a column'
+                    })
+                ])
+            ])
+        ];
+    };
+
 
     // Use default WordPress registry
 
@@ -51,14 +115,14 @@ const FrontendGutenbergEditor = () => {
                 
                 setBlocks(contentBlocks);
             } else {
-                // Start with empty blocks for new posts
-                setBlocks([]);
+                // Start with template blocks for new posts
+                setBlocks(createInitialTemplate());
             }
         } else {
-            // No post data - start with empty blocks
+            // No post data - start with template blocks
             setPostId(0);
             setPostTitle('');
-            setBlocks([]);
+            setBlocks(createInitialTemplate());
         }
     }, []);
 

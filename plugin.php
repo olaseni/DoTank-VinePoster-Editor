@@ -15,22 +15,26 @@ class ContentManager
 {
     private bool $isFrontendEditorEnabled = false;
 
-    public static function log(string ...$messages)
+    public static function log(...$messages)
     {
+        if (count($messages) === 1) {
+            $messages = $messages[0];
+        }
         // Convert the entire messages array to string and log it
-        error_log(PHP_EOL . 'ERROR_LOG:' . print_r($messages, true));
+        error_log(' ' . print_r($messages, true));
     }
 
     public function __construct()
     {
         $this->isFrontendEditorEnabled = ($_GET['frontend-editor'] ?? '') === '1';
-        
+
         // Grant capabilities IMMEDIATELY if frontend editor is detected
         if ($this->isFrontendEditorEnabled || $this->is_frontend_editor_request()) {
             add_filter('user_has_cap', [$this, 'grant_temporary_caps'], 10, 3);
         }
         
         add_action('init', [$this, 'register_post_type']);
+        add_action('show_admin_bar', fn() => !$this->isFrontendEditorEnabled);
         add_action('rest_api_init', [$this, 'register_rest_routes']);
         add_action('save_post_managed_content', [$this, 'calculate_read_time'], 10, 3);
         add_action('template_redirect', [$this, 'frontend_editor_redirect']);
@@ -79,7 +83,6 @@ class ContentManager
 
     public function register_meta_fields()
     {
-
         // Authors meta field
         register_post_meta('managed_content', 'content_authors', [
             'show_in_rest' => [
@@ -182,24 +185,18 @@ class ContentManager
 
     public function enqueue_frontend_editor_assets()
     {
-        // Log every time this function runs
-        error_log('enqueue_frontend_editor_assets called with GET: ' . print_r($_GET, true));
-
         if (! $this->isFrontendEditorEnabled) {
-            error_log('Frontend editor NOT detected');
+            self::log('Frontend editor NOT detected');
             return;
         }
-
-        error_log('Frontend editor detected, starting enqueue process');
 
         // Use the auto-generated asset file for dependencies
         $asset_file = plugin_dir_path(__FILE__) . 'build/index.asset.php';
         $asset = file_exists($asset_file) ? include $asset_file : ['dependencies' => [], 'version' => '1.0.0'];
 
-        error_log('Asset file exists: ' . (file_exists($asset_file) ? 'YES' : 'NO'));
-        error_log('Asset data: ' . print_r($asset, true));
+        self::log('Asset data: ' . print_r($asset, true));
 
-        $script_enqueued = wp_enqueue_script(
+        wp_enqueue_script(
             'frontend-editor',
             plugin_dir_url(__FILE__) . 'build/index.js',
             $asset['dependencies'],
@@ -207,18 +204,14 @@ class ContentManager
             true
         );
 
-        error_log('Script enqueue result: ' . ($script_enqueued ? 'SUCCESS' : 'FAILED'));
-        error_log('Script URL: ' . plugin_dir_url(__FILE__) . 'build/index.js');
-
         // Enqueue our custom styles
-        $style_enqueued = wp_enqueue_style(
+        wp_enqueue_style(
             'frontend-editor',
             plugin_dir_url(__FILE__) . 'build/style-index.css',
-            ['wp-edit-post', 'wp-block-editor', 'wp-components'],
+            ['wp-edit-post', 'wp-block-editor', 'wp-components', 'wp-block-library', 'wp-block-library-theme', 'wp-components', 'wp-editor'],
             $asset['version']
         );
 
-        error_log('Style enqueue result: ' . ($style_enqueued ? 'SUCCESS' : 'FAILED'));
 
         // Localize script with REST API data
         wp_localize_script('frontend-editor', 'frontendEditorData', [
@@ -243,17 +236,28 @@ class ContentManager
             ]
         ]);
 
-        error_log('Localization completed');
+        self::log(__METHOD__ . ' completed');
     }
 
     public function debug_enqueued_scripts()
     {
-        if ($this->isFrontendEditorEnabled) {
-            global $wp_scripts;
-            error_log('=== DEBUG ENQUEUED SCRIPTS ===');
-            error_log('Enqueued scripts: ' . print_r($wp_scripts->queue, true));
-            error_log('Is frontend-editor enqueued? ' . (wp_script_is('frontend-editor', 'enqueued') ? 'YES' : 'NO'));
-            error_log('Is frontend-editor registered? ' . (wp_script_is('frontend-editor', 'registered') ? 'YES' : 'NO'));
+        if (!$this->isFrontendEditorEnabled) {
+            return;
+        }
+        $assets = [
+            'frontend-editor',
+            'wp-editor',
+            'wp-edit-post'
+        ];
+        foreach ($assets as $asset) {
+            $details = [' ... ENQUEUE-DEBUG::[' . $asset . ']'];
+            if (wp_script_is($asset, 'registered')) {
+                $details[] = 'Registered';
+            }
+            if (wp_script_is($asset, 'enqueued')) {
+                $details[] = 'Enqueued';
+            }
+            self::log(implode(' ', $details));
         }
     }
 
@@ -289,7 +293,7 @@ class ContentManager
         }
 
         wp_die(json_encode([
-            'success' => true, 
+            'success' => true,
             'data' => [
                 'message' => 'Post saved successfully',
                 'post_id' => $result
@@ -331,7 +335,7 @@ class ContentManager
         $post_url = get_permalink($result);
 
         wp_die(json_encode([
-            'success' => true, 
+            'success' => true,
             'data' => [
                 'message' => 'Post published successfully',
                 'post_id' => $result,
@@ -348,7 +352,7 @@ class ContentManager
         $mimes['gif'] = 'image/gif';
         $mimes['png'] = 'image/png';
         $mimes['webp'] = 'image/webp';
-        
+
         self::log('allow_upload_mimes called', 'Frontend enabled: ' . ($this->isFrontendEditorEnabled ? 'YES' : 'NO'), 'Allowed mimes: ' . print_r($mimes, true));
         return $mimes;
     }
@@ -358,14 +362,14 @@ class ContentManager
         // Allow common image extensions
         $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         $file_ext = pathinfo($filename, PATHINFO_EXTENSION);
-        
+
         if (in_array(strtolower($file_ext), $allowed_extensions)) {
             // Override WordPress restrictions for these image types
             $data['ext'] = $file_ext;
             $data['type'] = 'image/' . ($file_ext === 'jpg' ? 'jpeg' : $file_ext);
             $data['proper_filename'] = $filename;
         }
-        
+
         self::log('check_filetype_and_ext called', 'File: ' . $filename, 'Data: ' . print_r($data, true));
         return $data;
     }

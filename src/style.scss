@@ -1,6 +1,15 @@
 /* Gutenberg Native Editor Styles */
 @import './components/EditorSidebar.scss';
 
+/* WordPress block styles are loaded via PHP enqueue_style */
+
+/* Minimal block style overrides for frontend editor */
+.wp-block-image {
+    &.size-thumbnail img {
+        border-radius: 50%; /* Make avatar circular */
+    }
+}
+
 
 /* Prevent any scrollbars and reset positioning */
 html, body {
@@ -402,6 +411,7 @@ html.wp-toolbar {
 .frontend-editor-content {
     
     .post-title-section {
+        padding: 32px 24px 24px 24px;
         background: white;
         border-bottom: 1px solid #f0f0f0;
         
@@ -476,15 +486,25 @@ html.wp-toolbar {
         }
         
         .block-editor-block-list__layout {
-            min-height: 100%;
-            padding-bottom: 50vh; // Allow scrolling past last block
-            
             .wp-block {
                 max-width: none;
             }
             
             .wp-block[data-type] {
-                margin: 16px 0;
+                margin: 24px 0;
+            }
+            
+            // Better spacing for specific blocks
+            .wp-block[data-type="core/group"] {
+                margin: 32px 0;
+            }
+            
+            .wp-block[data-type="core/media-text"] {
+                margin: 32px 0;
+            }
+            
+            .wp-block[data-type="core/columns"] {
+                margin: 32px 0;
             }
         }
         
