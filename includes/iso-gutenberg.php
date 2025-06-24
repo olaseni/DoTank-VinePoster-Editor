@@ -72,7 +72,7 @@ class IsoEditor_Gutenberg {
 		require_once ABSPATH . 'wp-admin/includes/post.php';
 
 		// Fake a WP_Screen object so we can pretend we're in the block editor, and therefore other block libraries load
-		set_current_screen();
+		// set_current_screen();
 
 		$current_screen = get_current_screen();
 		if ( $current_screen ) {
