@@ -1,4 +1,5 @@
-import { useState, useEffect } from '@wordpress/element';
+import '@wordpress/editor';
+import { StrictMode, useState, useEffect } from '@wordpress/element';
 import { parse, serialize, createBlock } from '@wordpress/blocks';
 import {
     BlockEditorProvider,
