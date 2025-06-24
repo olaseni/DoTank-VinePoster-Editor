@@ -14,6 +14,7 @@ if (!defined('ABSPATH')) {
 class ContentManager
 {
     private bool $isFrontendEditorEnabled = false;
+    private bool $isFrontendSampleEnabled = false;
 
     public static function log(...$messages)
     {
@@ -27,17 +28,35 @@ class ContentManager
     public function __construct()
     {
         $this->isFrontendEditorEnabled = ($_GET['frontend-editor'] ?? '') === '1';
+        $this->isFrontendSampleEnabled = ($_GET['frontend-sample'] ?? '') === '1';
+        
+        // Filter out deprecation warnings for frontend editor
+        if ($this->isFrontendEditorEnabled) {
+            set_error_handler(function($errno, $errstr, $errfile, $errline) {
+                // Skip deprecation warnings
+                if ($errno === E_USER_DEPRECATED || strpos($errstr, 'deprecated') !== false) {
+                    return true;
+                }
+                // Let other errors through
+                return false;
+            });
+        }
 
         // Grant capabilities IMMEDIATELY if frontend editor is detected
         if ($this->isFrontendEditorEnabled || $this->is_frontend_editor_request()) {
             add_filter('user_has_cap', [$this, 'grant_temporary_caps'], 10, 3);
         }
-        
-        add_action('init', [$this, 'register_post_type']);
+
+        add_action('init', [$this, 'init']);
         add_action('show_admin_bar', fn() => !$this->isFrontendEditorEnabled);
+        add_action('template_redirect', [$this, 'frontend_editor_redirect']);
+
+        if ($this->isFrontendSampleEnabled) {
+            return;
+        }
+
         add_action('rest_api_init', [$this, 'register_rest_routes']);
         add_action('save_post_managed_content', [$this, 'calculate_read_time'], 10, 3);
-        add_action('template_redirect', [$this, 'frontend_editor_redirect']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_editor_assets']);
         add_action('wp_print_scripts', [$this, 'debug_enqueued_scripts']);
         add_action('wp_ajax_nopriv_save_post_content', [$this, 'ajax_save_post_content']);
@@ -48,8 +67,12 @@ class ContentManager
         add_filter('wp_check_filetype_and_ext', [$this, 'check_filetype_and_ext'], 10, 5);
     }
 
-    public function register_post_type()
+    public function init()
     {
+        include plugin_dir_path(__FILE__) . 'includes/iso-gutenberg.php';
+        $gutenberg = new IsoEditor_Gutenberg();
+        $gutenberg->load();
+
         register_post_type('managed_content', [
             'labels' => [
                 'name' => 'Content Manager',
@@ -181,6 +204,10 @@ class ContentManager
             include plugin_dir_path(__FILE__) . 'includes/frontend-editor.php';
             exit;
         }
+        if (($_GET['frontend-sample'] ?? '') === '1') {
+            include plugin_dir_path(__FILE__) . 'includes/frontend-sample.php';
+            exit;
+        }
     }
 
     public function enqueue_frontend_editor_assets()
@@ -203,7 +230,7 @@ class ContentManager
             $asset['version'],
             true
         );
-        
+
         // Enqueue our custom styles
         wp_enqueue_style(
             'frontend-editor',
