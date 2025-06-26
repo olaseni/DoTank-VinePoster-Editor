@@ -1,6 +1,6 @@
 import { createRoot } from '@wordpress/element';
 import { registerCoreBlocks } from '@wordpress/block-library';
-import FrontendGutenbergEditor from './FrontendGutenbergEditor';
+import FrontendEditor from './FrontendEditor';
 import './style.scss';
 import './combined-block-styles.scss';
 
@@ -15,7 +15,7 @@ const editorRoot = document.getElementById('frontend-editor-root');
 if (editorRoot && window.frontendEditorData) {
     console.log('Frontend Editor: Rendering full Gutenberg editor');
     const root = createRoot(editorRoot)
-    root.render(<FrontendGutenbergEditor />);
+    root.render(<FrontendEditor />);
 } else {
     console.error('Frontend Editor: Missing root element or data', {
         editorRoot,
