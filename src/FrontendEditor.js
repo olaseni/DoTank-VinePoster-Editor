@@ -225,7 +225,16 @@ const FrontendEditor = () => {
                                     canUserUseUnfilteredHTML: true,
                                     __experimentalCanUserUseUnfilteredHTML: true,
                                     mediaUpload: mediaUploadUtilityWithNonce(window?.frontendEditorData?.nonce),
-                                    allowedMimeTypes: mimeTypeToExtension
+                                    allowedMimeTypes: mimeTypeToExtension,
+                                    allowedBlockTypes: [
+                                        'core/video',
+                                        'core/image', 
+                                        'core/columns',
+                                        'core/column',
+                                        'core/group',
+                                        'core/paragraph',
+                                        'core/button'
+                                    ]
                                 }}
                             >
                                 <BlockTools>
