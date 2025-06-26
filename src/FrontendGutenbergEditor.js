@@ -7,20 +7,18 @@ import {
     BlockTools,
     WritingFlow,
     ObserveTyping,
-    MediaUpload,
-    useBlockProps,
     store as blockEditorStore
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
+import { useSelect } from '@wordpress/data';
 import {
     Button,
     SlotFillProvider,
     DropZoneProvider,
     Popover
 } from '@wordpress/components';
-import { uploadMedia } from '@wordpress/media-utils';
 import EditorSidebar from './components/EditorSidebar';
+import SelectionChangeWatcher from './components/SelectionChangeWatcher';
+import { mediaUploadUtilityWithNonce } from './utilities/mediaUploadUtility';
 
 const FrontendGutenbergEditor = () => {
     const [blocks, setBlocks] = useState([]);
@@ -219,10 +217,6 @@ const FrontendGutenbergEditor = () => {
         }
     };
 
-    const goHome = () => {
-        window.location.href = window.frontendEditorData.homeUrl;
-    };
-
     // Function to insert a new block at the current position
     const handleInsertBlock = (newBlock, insertIndex = -1) => {
         const updatedBlocks = [...blocks];
@@ -234,6 +228,7 @@ const FrontendGutenbergEditor = () => {
         setCurrentInsertionIndex(index + 1);
 
         console.log(`Inserted ${newBlock.name} at index ${index}`);
+        console.log(selectedBlockClientId);
     };
 
     // Track block selection to update insertion point
@@ -243,6 +238,11 @@ const FrontendGutenbergEditor = () => {
             setCurrentInsertionIndex(blockIndex + 1);
         }
     };
+
+    const selectedBlockClientId = useSelect(
+        (select) => select(blockEditorStore).getSelectedBlockClientId(),
+        [blocks]
+    );
 
     return (
         <SlotFillProvider>
@@ -274,53 +274,14 @@ const FrontendGutenbergEditor = () => {
                                     // Update insertion index when blocks change
                                     setCurrentInsertionIndex(newBlocks.length);
                                 }}
+
                                 settings={{
                                     hasFixedToolbar: false,
                                     focusMode: false,
                                     hasReducedUI: false,
                                     canUserUseUnfilteredHTML: true,
                                     __experimentalCanUserUseUnfilteredHTML: true,
-                                    mediaUpload: ({ filesList, onFileChange, allowedTypes, onError }) => {
-                                        console.log('Media upload called with:', { filesList, allowedTypes });
-                                        console.log('Frontend editor data:', window.frontendEditorData);
-
-                                        // Handle allowedTypes being undefined by using image types
-                                        const types = allowedTypes || ['image'];
-                                        console.log('Using allowedTypes:', types);
-
-                                        // WordPress expects MIME types in this format for client-side validation
-                                        const wpMimeTypes = {
-                                            'jpg|jpeg|jpe': 'image/jpeg',
-                                            'gif': 'image/gif',
-                                            'png': 'image/png',
-                                            'webp': 'image/webp'
-                                        };
-
-                                        uploadMedia({
-                                            filesList,
-                                            onFileChange: (media) => {
-                                                console.log('Upload successful:', media);
-                                                if (Array.isArray(media)) {
-                                                    onFileChange(media);
-                                                } else {
-                                                    onFileChange([media]);
-                                                }
-                                            },
-                                            allowedTypes: types,
-                                            onError: (error) => {
-                                                console.error('Upload error:', error);
-                                                if (onError) {
-                                                    onError(error);
-                                                } else {
-                                                    alert('Upload failed: ' + (error.message || error));
-                                                }
-                                            },
-                                            wpAllowedMimeTypes: wpMimeTypes,
-                                            additionalData: {
-                                                _wpnonce: window.frontendEditorData?.nonce
-                                            }
-                                        });
-                                    },
+                                    mediaUpload: mediaUploadUtilityWithNonce(window?.frontendEditorData?.nonce),
                                     allowedMimeTypes: {
                                         'image/jpeg': 'jpg',
                                         'image/png': 'png',
@@ -336,6 +297,11 @@ const FrontendGutenbergEditor = () => {
                                         </ObserveTyping>
                                     </WritingFlow>
                                 </BlockTools>
+                                <SelectionChangeWatcher
+                                    onSelectionChange={(clientId) => {
+                                        console.log('Selected block changed:', clientId);
+                                    }}
+                                />
                             </BlockEditorProvider>
                         </div>
                     </div>
