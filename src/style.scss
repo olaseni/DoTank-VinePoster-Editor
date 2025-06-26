@@ -2,33 +2,6 @@
 @import './components/EditorSidebar.scss';
 
 /* Template Region Styling */
-.template-header {
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    position: relative;
-    
-    &::before {
-        content: "FIXED HEADER";
-        position: absolute;
-        top: -8px;
-        left: 12px;
-        background: #6c757d;
-        color: white;
-        padding: 2px 8px;
-        font-size: 10px;
-        font-weight: bold;
-        border-radius: 4px;
-    }
-    
-    .fixed-header {
-        margin: 0;
-        color: #495057;
-    }
-}
-
 .editable-description {
     background: #e8f5e8;
     border: 2px dashed #28a745;

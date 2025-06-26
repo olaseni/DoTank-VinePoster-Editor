@@ -34,19 +34,6 @@ const FrontendGutenbergEditor = () => {
     // Create initial template with locked/unlocked regions
     const createInitialTemplate = () => {
         return [
-            // FIXED: Header section (locked)
-            createBlock('core/group', {
-                className: 'template-header',
-                lock: { move: true, remove: true },
-                templateLock: 'all'
-            }, [
-                createBlock('core/heading', {
-                    content: 'Article Template',
-                    level: 1,
-                    className: 'fixed-header'
-                })
-            ]),
-
             // EDITABLE: Description section
             createBlock('core/group', {
                 className: 'editable-description',
