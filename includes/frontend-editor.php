@@ -7,7 +7,7 @@
     <?php wp_head(); ?>
 </head>
 <body class="block-editor-page">
-    <div id="frontend-editor-root" class="edit-post-layout">
+    <div id="frontend-editor-root" class="edit-post-layout editor">
         <!-- Full-screen Gutenberg editor will be mounted here -->
     </div>
     <?php wp_footer(); ?>

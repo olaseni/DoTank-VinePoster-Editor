@@ -3,6 +3,7 @@ update-parent-repo.sh
 src-wordpress
 build
 dist
+.search
 pid/
 logs/
 log/

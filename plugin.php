@@ -67,11 +67,16 @@ class ContentManager
         add_filter('wp_check_filetype_and_ext', [$this, 'check_filetype_and_ext'], 10, 5);
     }
 
-    public function init()
+    public function loadIsoGutenberg()
     {
         include plugin_dir_path(__FILE__) . 'includes/iso-gutenberg.php';
         $gutenberg = new IsoEditor_Gutenberg();
         $gutenberg->load();
+    }    
+
+    public function init()
+    {
+        $this->loadIsoGutenberg();
 
         register_post_type('managed_content', [
             'labels' => [
@@ -233,12 +238,19 @@ class ContentManager
 
         // Enqueue our custom styles
         wp_enqueue_style(
+            'frontend-editor-core',
+            plugin_dir_url(__FILE__) . 'build/index.css',
+            [],
+            $asset['version']
+        );
+
+        // Enqueue our custom styles
+        wp_enqueue_style(
             'frontend-editor',
             plugin_dir_url(__FILE__) . 'build/style-index.css',
             ['wp-edit-post', 'wp-block-editor', 'wp-components', 'wp-block-library', 'wp-block-library-theme', 'wp-edit-blocks', 'common'],
             $asset['version']
         );
-
 
         // Localize script with REST API data
         wp_localize_script('frontend-editor', 'frontendEditorData', [

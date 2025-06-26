@@ -31,21 +31,48 @@ const FrontendGutenbergEditor = () => {
     // Track current insertion index (where new blocks should be inserted)
     const [currentInsertionIndex, setCurrentInsertionIndex] = useState(-1);
 
-    // Create initial template based on prototype
+    // Create initial template with locked/unlocked regions
     const createInitialTemplate = () => {
         return [
-            // Description paragraph
-            createBlock('core/paragraph', {
-                content: '',
-                placeholder: 'A Short Description',
-                fontSize: 'medium'
-            }),
+            // FIXED: Header section (locked)
+            createBlock('core/group', {
+                className: 'template-header',
+                lock: { move: true, remove: true },
+                templateLock: 'all'
+            }, [
+                createBlock('core/heading', {
+                    content: 'Article Template',
+                    level: 1,
+                    className: 'fixed-header'
+                })
+            ]),
 
-            // Author section using group block
-            createBlock('core/columns', {
-                    columns: 2
+            // EDITABLE: Description section
+            createBlock('core/group', {
+                className: 'editable-description',
+                lock: { move: true, remove: true },
+                templateLock: false
+            }, [
+                createBlock('core/paragraph', {
+                    content: '',
+                    placeholder: 'Write your description here...',
+                    fontSize: 'medium'
+                })
+            ]),
+
+            // FIXED: Author section structure (locked, but content editable)
+            createBlock('core/group', {
+                className: 'template-author',
+                lock: { move: true, remove: true },
+                templateLock: 'insert'
+            }, [
+                createBlock('core/columns', {
+                    columns: 2,
+                    lock: { move: true, remove: true }
                 }, [
-                    createBlock('core/column', {}, [
+                    createBlock('core/column', {
+                        lock: { move: true, remove: true }
+                    }, [
                         createBlock('core/image', {
                             url: '',
                             alt: 'Author Avatar',
@@ -54,48 +81,55 @@ const FrontendGutenbergEditor = () => {
                             sizeSlug: 'thumbnail'
                         })
                     ]),
-                    createBlock('core/column', {}, [
+                    createBlock('core/column', {
+                        lock: { move: true, remove: true }
+                    }, [
                         createBlock('core/paragraph', {
                             content: '',
                             placeholder: 'Author Name'
                         })
                     ])
-                ]),
+                ])
+            ]),
 
-            // Main content area with media and text
-            createBlock('core/media-text', {
-                mediaPosition: 'left',
-                mediaType: 'image',
-                url:'',
-                mediaUrl:'',
-                imageFill: false,
-                focalPoint: { x: 0.5, y: 0.5 }
+            // EDITABLE: Main content area (completely flexible)
+            createBlock('core/group', {
+                className: 'editable-main-content',
+                lock: { move: true, remove: true },
+                templateLock: false
             }, [
                 createBlock('core/paragraph', {
                     content: '',
-                    placeholder: 'Some more content can come in here'
-                }),
-                createBlock('core/paragraph', {
-                    content: '',
-                    placeholder: 'Even more content goes in here'
+                    placeholder: 'Add your main content here. You can add any blocks in this section.'
                 })
             ]),
 
-            // Two-column layout at bottom
-            createBlock('core/columns', {
-                columns: 2
+            // FIXED: Footer columns (structure locked, content editable)
+            createBlock('core/group', {
+                className: 'template-footer',
+                lock: { move: true, remove: true },
+                templateLock: 'insert'
             }, [
-                createBlock('core/column', {}, [
-                    createBlock('core/paragraph', {
-                        content: '',
-                        placeholder: 'This content fits in a column'
-                    })
-                ]),
-                createBlock('core/column', {}, [
-                    createBlock('core/paragraph', {
-                        content: '',
-                        placeholder: 'This content fits in a column'
-                    })
+                createBlock('core/columns', {
+                    columns: 2,
+                    lock: { move: true, remove: true }
+                }, [
+                    createBlock('core/column', {
+                        lock: { move: true, remove: true }
+                    }, [
+                        createBlock('core/paragraph', {
+                            content: '',
+                            placeholder: 'Footer content column 1'
+                        })
+                    ]),
+                    createBlock('core/column', {
+                        lock: { move: true, remove: true }
+                    }, [
+                        createBlock('core/paragraph', {
+                            content: '',
+                            placeholder: 'Footer content column 2'
+                        })
+                    ])
                 ])
             ])
         ];

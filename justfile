@@ -10,10 +10,10 @@ clean:
 install: clean
     npm install
 
-build:
+build: combine-block-css
     npm run build
 
-build-dev:
+build-dev: combine-block-css
     npm run start
 
 start: stop
@@ -62,3 +62,7 @@ blueprint-remote:
 
 git-push:
     git push
+
+# Combine Gutenberg block styles
+combine-block-css:
+    php -r 'require "includes/Utilities.php"; Utilities::combineBlockStyles("src-wordpress/wp-includes/blocks", "src/combined-block-styles.scss");'

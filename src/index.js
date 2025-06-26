@@ -2,6 +2,7 @@ import { render } from '@wordpress/element';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import FrontendGutenbergEditor from './FrontendGutenbergEditor';
 import './style.scss';
+import './combined-block-styles.scss';
 
 // Register all core blocks
 registerCoreBlocks();
