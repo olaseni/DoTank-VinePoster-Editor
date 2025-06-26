@@ -133,15 +133,45 @@ const FrontendEditor = () => {
         if (currentSelectedBlockClientId) {
             // Only allow insertion in column and group containers
             const allowedContainerTypes = ['core/column', 'core/group'];
+            const containerOfContainerTypes = ['core/columns'];
             
-            // Search only in column/group container blocks
+            // Search for the selected block and handle insertion
             const findAndInsertInContainer = (blocksArray) => {
                 for (let i = 0; i < blocksArray.length; i++) {
                     const block = blocksArray[i];
                     
+                    // Check if the selected block IS this container of containers (e.g., columns)
+                    if (block.clientId === currentSelectedBlockClientId && 
+                        containerOfContainerTypes.includes(block.name) &&
+                        block.innerBlocks && block.innerBlocks.length > 0) {
+                        
+                        // Find the first sub-container (e.g., first column)
+                        const firstSubContainer = block.innerBlocks[0];
+                        if (firstSubContainer && allowedContainerTypes.includes(firstSubContainer.name)) {
+                            // Insert at the end of the first sub-container
+                            const updatedFirstSubContainer = {
+                                ...firstSubContainer,
+                                innerBlocks: [...firstSubContainer.innerBlocks, newBlock]
+                            };
+                            
+                            const updatedInnerBlocks = [...block.innerBlocks];
+                            updatedInnerBlocks[0] = updatedFirstSubContainer;
+                            
+                            const updatedBlock = {
+                                ...block,
+                                innerBlocks: updatedInnerBlocks
+                            };
+                            
+                            const updatedBlocks = [...blocksArray];
+                            updatedBlocks[i] = updatedBlock;
+                            
+                            return updatedBlocks;
+                        }
+                    }
+                    
+                    // Check if selected block is in this container's inner blocks
                     if (block.innerBlocks && block.innerBlocks.length > 0 && 
                         allowedContainerTypes.includes(block.name)) {
-                        // Check if selected block is in this container's inner blocks
                         const innerBlockIndex = block.innerBlocks.findIndex(
                             innerBlock => innerBlock.clientId === currentSelectedBlockClientId
                         );
@@ -163,8 +193,10 @@ const FrontendEditor = () => {
                             
                             return updatedBlocks;
                         }
-                        
-                        // Recursively search deeper nested blocks in allowed containers
+                    }
+                    
+                    // Recursively search deeper nested blocks
+                    if (block.innerBlocks && block.innerBlocks.length > 0) {
                         const nestedResult = findAndInsertInContainer(block.innerBlocks);
                         if (nestedResult) {
                             const updatedBlock = {
@@ -183,9 +215,9 @@ const FrontendEditor = () => {
             const updatedBlocks = findAndInsertInContainer(blocks);
             if (updatedBlocks) {
                 setBlocks(updatedBlocks);
-                console.log(`Inserted ${newBlock.name} after selected block in column/group container`);
+                console.log(`Inserted ${newBlock.name} successfully`);
             } else {
-                console.log(`No column/group container found for selected block - block insertion skipped`);
+                console.log(`No valid container found for selected block - block insertion skipped`);
             }
         } else {
             console.log(`No block selected - block insertion skipped`);

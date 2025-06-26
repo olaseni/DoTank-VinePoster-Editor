@@ -7,7 +7,8 @@ const createInitialTemplate = () => {
         createBlock('core/group', {
             className: 'editable-description',
             lock: { move: true, remove: true },
-            templateLock: false
+            templateLock: false,
+            allowedBlocks: ['core/paragraph', 'core/image']
         }, [
             createBlock('core/paragraph', {
                 content: '',
@@ -24,10 +25,12 @@ const createInitialTemplate = () => {
         }, [
             createBlock('core/columns', {
                 columns: 2,
-                lock: { move: true, remove: true }
+                lock: { move: true, remove: true },
+                allowedBlocks: ['core/column']
             }, [
                 createBlock('core/column', {
-                    lock: { move: true, remove: true }
+                    lock: { move: true, remove: true },
+                    allowedBlocks: ['core/image']
                 }, [
                     createBlock('core/image', {
                         url: '',
@@ -38,7 +41,8 @@ const createInitialTemplate = () => {
                     })
                 ]),
                 createBlock('core/column', {
-                    lock: { move: true, remove: true }
+                    lock: { move: true, remove: true },
+                    allowedBlocks: ['core/paragraph']
                 }, [
                     createBlock('core/paragraph', {
                         content: '',
@@ -52,7 +56,8 @@ const createInitialTemplate = () => {
         createBlock('core/group', {
             className: 'editable-main-content',
             lock: { move: true, remove: true },
-            templateLock: false
+            templateLock: false,
+            allowedBlocks: ['core/paragraph', 'core/image', 'core/video', 'core/button', 'core/columns', 'core/group']
         }, [
             createBlock('core/paragraph', {
                 content: '',
@@ -68,10 +73,12 @@ const createInitialTemplate = () => {
         }, [
             createBlock('core/columns', {
                 columns: 2,
-                lock: { move: true, remove: true }
+                lock: { move: true, remove: true },
+                allowedBlocks: ['core/column']
             }, [
                 createBlock('core/column', {
-                    lock: { move: true, remove: true }
+                    lock: { move: true, remove: true },
+                    allowedBlocks: ['core/paragraph', 'core/button']
                 }, [
                     createBlock('core/paragraph', {
                         content: '',
@@ -79,7 +86,8 @@ const createInitialTemplate = () => {
                     })
                 ]),
                 createBlock('core/column', {
-                    lock: { move: true, remove: true }
+                    lock: { move: true, remove: true },
+                    allowedBlocks: ['core/paragraph', 'core/button']
                 }, [
                     createBlock('core/paragraph', {
                         content: '',
