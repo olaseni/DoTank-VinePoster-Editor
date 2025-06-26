@@ -1,12 +1,23 @@
 import { uploadMedia } from '@wordpress/media-utils';
 
-// WordPress expects MIME types in this format for client-side validation
-const wpAllowedMimeTypes = {
-    'jpg|jpeg|jpe': 'image/jpeg',
-    'gif': 'image/gif',
-    'png': 'image/png',
-    'webp': 'image/webp'
+const mimeTypeToExtension = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/gif': 'gif',
+    'image/webp': 'webp'
 };
+
+// Convert to extension(s) → MIME
+const allowedMimeTypes = Object.entries(mimeTypeToExtension).reduce((acc, [mime, ext]) => {
+    let exts;
+    if (mime === 'image/jpeg') {
+        exts = 'jpg|jpeg|jpe'; // Common JPEG extensions
+    } else {
+        exts = ext;
+    }
+    acc[exts] = mime;
+    return acc;
+}, {});
 
 const mediaUploadUtility = ({ filesList, onFileChange, allowedTypes, onError, nonce }) => {
     console.log('Media upload called with:', { filesList, allowedTypes });
@@ -34,7 +45,7 @@ const mediaUploadUtility = ({ filesList, onFileChange, allowedTypes, onError, no
                 alert('Upload failed: ' + (error.message || error));
             }
         },
-        wpAllowedMimeTypes,
+        wpAllowedMimeTypes: allowedMimeTypes,
         additionalData: {
             _wpnonce: nonce ?? null
         }
@@ -45,4 +56,4 @@ const mediaUploadUtilityWithNonce = (nonce) => (parameters) => {
     return mediaUploadUtility({ ...parameters, nonce });
 };
 
-export { mediaUploadUtility, mediaUploadUtilityWithNonce };
+export { mediaUploadUtility, mediaUploadUtilityWithNonce, mimeTypeToExtension };

@@ -1,6 +1,6 @@
 import '@wordpress/editor';
 import { StrictMode, useState, useEffect } from '@wordpress/element';
-import { parse, serialize, createBlock } from '@wordpress/blocks';
+import { parse, serialize } from '@wordpress/blocks';
 import {
     BlockEditorProvider,
     BlockList,
@@ -9,7 +9,7 @@ import {
     ObserveTyping,
     store as blockEditorStore
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { select, dispatch, useSelect } from '@wordpress/data';
 import {
     Button,
     SlotFillProvider,
@@ -18,7 +18,7 @@ import {
 } from '@wordpress/components';
 import EditorSidebar from './components/EditorSidebar';
 import SelectionChangeWatcher from './components/SelectionChangeWatcher';
-import { mediaUploadUtilityWithNonce } from './utilities/mediaUploadUtility';
+import { mediaUploadUtilityWithNonce, mimeTypeToExtension } from './utilities/mediaUploadUtility';
 import createInitialTemplate from './utilities/createInitialTemplate';
 
 const FrontendEditor = () => {
@@ -27,8 +27,8 @@ const FrontendEditor = () => {
     const [postId, setPostId] = useState(0);
     const [postTitle, setPostTitle] = useState('');
 
-    // Track current insertion index (where new blocks should be inserted)
-    const [currentInsertionIndex, setCurrentInsertionIndex] = useState(-1);
+    // Track current selected block index
+    const [currentSelectedBlockClientId, setCurrentSelectedBlockClientId] = useState(-1);
 
     // Use default WordPress registry
 
@@ -127,31 +127,24 @@ const FrontendEditor = () => {
     };
 
     // Function to insert a new block at the current position
-    const handleInsertBlock = (newBlock, insertIndex = -1) => {
-        const updatedBlocks = [...blocks];
-        const index = insertIndex >= 0 ? insertIndex : blocks.length;
-        updatedBlocks.splice(index, 0, newBlock);
-        setBlocks(updatedBlocks);
+    const handleInsertBlock = (newBlock) => {
+        // const updatedBlocks = [...blocks];
+        // updatedBlocks.splice(blocks.length, 0, newBlock);
+        // setBlocks(updatedBlocks);
 
-        // Set insertion index to after the newly inserted block
-        setCurrentInsertionIndex(index + 1);
+        const { getBlockRootClientId } = select(blockEditorStore);
+        const rootClientId = getBlockRootClientId(currentSelectedBlockClientId);
 
-        console.log(`Inserted ${newBlock.name} at index ${index}`);
-        console.log(selectedBlockClientId);
+        const position = rootClientId ? blocks.length : null;
+        const clientId = rootClientId ?? currentSelectedBlockClientId;
+
+        dispatch(blockEditorStore).insertBlock(newBlock, position, clientId);
+
+        console.log(`Inserted ${newBlock.name}`);
+        console.log(`Selected clientId:  ${currentSelectedBlockClientId}`);
+        console.log(`rootClientId:  ${rootClientId}`);
+        console.log(blocks.length);
     };
-
-    // Track block selection to update insertion point
-    const handleBlockSelection = (clientId) => {
-        if (clientId) {
-            const blockIndex = blocks.findIndex(block => block.clientId === clientId);
-            setCurrentInsertionIndex(blockIndex + 1);
-        }
-    };
-
-    const selectedBlockClientId = useSelect(
-        (select) => select(blockEditorStore).getSelectedBlockClientId(),
-        [blocks]
-    );
 
     return (
         <SlotFillProvider>
@@ -178,12 +171,7 @@ const FrontendEditor = () => {
                             <BlockEditorProvider
                                 value={blocks}
                                 onInput={setBlocks}
-                                onChange={(newBlocks) => {
-                                    setBlocks(newBlocks);
-                                    // Update insertion index when blocks change
-                                    setCurrentInsertionIndex(newBlocks.length);
-                                }}
-
+                                onChange={setBlocks}
                                 settings={{
                                     hasFixedToolbar: false,
                                     focusMode: false,
@@ -191,12 +179,7 @@ const FrontendEditor = () => {
                                     canUserUseUnfilteredHTML: true,
                                     __experimentalCanUserUseUnfilteredHTML: true,
                                     mediaUpload: mediaUploadUtilityWithNonce(window?.frontendEditorData?.nonce),
-                                    allowedMimeTypes: {
-                                        'image/jpeg': 'jpg',
-                                        'image/png': 'png',
-                                        'image/gif': 'gif',
-                                        'image/webp': 'webp'
-                                    }
+                                    allowedMimeTypes: mimeTypeToExtension
                                 }}
                             >
                                 <BlockTools>
@@ -207,9 +190,10 @@ const FrontendEditor = () => {
                                     </WritingFlow>
                                 </BlockTools>
                                 <SelectionChangeWatcher
-                                    onSelectionChange={(clientId) => {
-                                        console.log('Selected block changed:', clientId);
-                                    }}
+                                    onSelectionChange={setCurrentSelectedBlockClientId}
+                                />
+                                <EditorSidebar
+                                    onInsertBlock={handleInsertBlock}
                                 />
                             </BlockEditorProvider>
                         </div>
@@ -235,11 +219,6 @@ const FrontendEditor = () => {
                             Publish
                         </Button>
                     </div>
-
-                    <EditorSidebar
-                        onInsertBlock={handleInsertBlock}
-                        currentIndex={currentInsertionIndex}
-                    />
 
                     <Popover.Slot />
                 </div>

@@ -1,7 +1,7 @@
 import { Button, Panel, PanelBody, PanelRow } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 
-const EditorSidebar = ({ onInsertBlock, currentIndex = -1 }) => {
+const EditorSidebar = ({ onInsertBlock }) => {
     
     const handleInsertBlock = (blockType, attributes = {}) => {
         let newBlock;
@@ -26,7 +26,7 @@ const EditorSidebar = ({ onInsertBlock, currentIndex = -1 }) => {
         }
         
         if (onInsertBlock) {
-            onInsertBlock(newBlock, currentIndex);
+            onInsertBlock(newBlock);
         }
     };
     return (
