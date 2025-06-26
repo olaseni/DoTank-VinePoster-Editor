@@ -28,7 +28,7 @@ const FrontendEditor = () => {
     const [postTitle, setPostTitle] = useState('');
 
     // Track current selected block index
-    const [currentSelectedBlockClientId, setCurrentSelectedBlockClientId] = useState(-1);
+    const [currentSelectedBlock, setCurrentSelectedBlock] = useState(-1);
 
     // Use default WordPress registry
 
@@ -132,6 +132,7 @@ const FrontendEditor = () => {
         // updatedBlocks.splice(blocks.length, 0, newBlock);
         // setBlocks(updatedBlocks);
 
+        const currentSelectedBlockClientId = currentSelectedBlock?.clientId;
         const { getBlockRootClientId } = select(blockEditorStore);
         const rootClientId = getBlockRootClientId(currentSelectedBlockClientId);
 
@@ -190,7 +191,7 @@ const FrontendEditor = () => {
                                     </WritingFlow>
                                 </BlockTools>
                                 <SelectionChangeWatcher
-                                    onSelectionChange={setCurrentSelectedBlockClientId}
+                                    onSelectionChange={setCurrentSelectedBlock}
                                 />
                                 <EditorSidebar
                                     onInsertBlock={handleInsertBlock}

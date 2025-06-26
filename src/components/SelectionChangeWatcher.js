@@ -3,19 +3,21 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useEffect, useRef } from 'react';
 
 const SelectionChangeWatcher = ({ onSelectionChange }) => {
-    const selectedClientId = useSelect(
-        (select) => select(blockEditorStore).getSelectedBlockClientId(),
+    const selectedBlock = useSelect(
+        (select) => select(blockEditorStore).getSelectedBlock(),
         []
     );
 
-    const previousClientId = useRef();
+    const previousBlockId = useRef();
 
     useEffect(() => {
-        if (previousClientId.current !== selectedClientId) {
-            previousClientId.current = selectedClientId;
-            onSelectionChange?.(selectedClientId);
+        const currentId = selectedBlock?.clientId;
+
+        if (previousBlockId.current !== currentId) {
+            previousBlockId.current = currentId;
+            onSelectionChange?.(selectedBlock);
         }
-    }, [selectedClientId]);
+    }, [selectedBlock]);
 
     return null;
 };
