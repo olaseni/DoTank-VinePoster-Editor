@@ -29,10 +29,10 @@ class ContentManager
     {
         $this->isFrontendEditorEnabled = ($_GET['frontend-editor'] ?? '') === '1';
         $this->isFrontendSampleEnabled = ($_GET['frontend-sample'] ?? '') === '1';
-        
+
         // Filter out deprecation warnings for frontend editor
         if ($this->isFrontendEditorEnabled) {
-            set_error_handler(function($errno, $errstr, $errfile, $errline) {
+            set_error_handler(function ($errno, $errstr, $errfile, $errline) {
                 // Skip deprecation warnings
                 if ($errno === E_USER_DEPRECATED || strpos($errstr, 'deprecated') !== false) {
                     return true;
@@ -72,10 +72,21 @@ class ContentManager
         include plugin_dir_path(__FILE__) . 'includes/iso-gutenberg.php';
         $gutenberg = new IsoEditor_Gutenberg();
         $gutenberg->load();
-    }    
+    }
+
+    public function disable_admin_bar_on_request()
+    {
+        add_filter('show_admin_bar', function ($show) {
+            if (isset($_GET['show_admin_bar']) && $_GET['show_admin_bar'] == 'false') {
+                return false;
+            }
+            return $show;
+        });
+    }
 
     public function init()
     {
+        $this->disable_admin_bar_on_request();
         $this->loadIsoGutenberg();
 
         register_post_type('managed_content', [

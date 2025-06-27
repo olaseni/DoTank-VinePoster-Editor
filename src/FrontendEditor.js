@@ -14,7 +14,8 @@ import {
     Button,
     SlotFillProvider,
     DropZoneProvider,
-    Popover
+    Popover,
+    Snackbar
 } from '@wordpress/components';
 import EditorSidebar from './components/EditorSidebar';
 import SelectionChangeWatcher from './components/SelectionChangeWatcher';
@@ -26,9 +27,26 @@ const FrontendEditor = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [postId, setPostId] = useState(0);
     const [postTitle, setPostTitle] = useState('');
+    const [notices, setNotices] = useState([]);
+    const [showPostPreview, setShowPostPreview] = useState(false);
+    const [publishedPostUrl, setPublishedPostUrl] = useState('');
 
     // Track current selected block index
     const [currentSelectedBlock, setCurrentSelectedBlock] = useState(-1);
+
+    // Notice management
+    const addNotice = (message, type = 'success', actions = []) => {
+        const id = Date.now();
+        setNotices(prev => [...prev, { id, message, type, actions }]);
+        // Auto-dismiss after 6 seconds
+        setTimeout(() => {
+            removeNotice(id);
+        }, 6000);
+    };
+
+    const removeNotice = (id) => {
+        setNotices(prev => prev.filter(notice => notice.id !== id));
+    };
 
     // Use default WordPress registry
 
@@ -108,18 +126,28 @@ const FrontendEditor = () => {
             console.log('Parsed result:', result);
 
             if (result.success) {
-                alert(result.data.message);
                 if (result.data.post_id && postId === 0) {
                     setPostId(result.data.post_id);
                 }
+                
                 if (status === 'publish' && result.data.post_url) {
-                    window.open(result.data.post_url, '_blank');
+                    setPublishedPostUrl(result.data.post_url);
+                    addNotice('Post published successfully!', 'success', [
+                        {
+                            label: 'View Post',
+                            onClick: () => {
+                                setShowPostPreview(true);
+                            }
+                        }
+                    ]);
+                } else {
+                    addNotice('Draft saved successfully.', 'success');
                 }
             } else {
-                alert(result.data.message || 'An error occurred');
+                addNotice(result.data.message || 'An error occurred', 'error');
             }
         } catch (error) {
-            alert('Network error occurred: ' + error.message);
+            addNotice('Network error occurred: ' + error.message, 'error');
             console.error('Save error:', error);
         } finally {
             setIsSaving(false);
@@ -308,6 +336,50 @@ const FrontendEditor = () => {
                     </div>
 
                     <Popover.Slot />
+                    
+                    {/* Notice System */}
+                    <div className="editor-notices">
+                        {notices.map((notice) => (
+                            <Snackbar
+                                key={notice.id}
+                                className={`editor-notice editor-notice--${notice.type}`}
+                                onRemove={() => removeNotice(notice.id)}
+                                actions={notice.actions}
+                            >
+                                {notice.message}
+                            </Snackbar>
+                        ))}
+                    </div>
+
+                    {/* Post Preview Modal */}
+                    {showPostPreview && publishedPostUrl && (
+                        <div 
+                            className="post-preview-modal-overlay"
+                            onClick={(e) => {
+                                if (e.target === e.currentTarget) {
+                                    setShowPostPreview(false);
+                                }
+                            }}
+                        >
+                            <div className="post-preview-modal">
+                                <div className="post-preview-content">
+                                    <iframe
+                                        src={`${publishedPostUrl}${publishedPostUrl.includes('?') ? '&' : '?'}show_admin_bar=false`}
+                                        frameBorder="0"
+                                        title="Published Post Preview"
+                                    />
+                                </div>
+                                <div className="post-preview-footer">
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => setShowPostPreview(false)}
+                                    >
+                                        Close
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </DropZoneProvider>
         </SlotFillProvider>
