@@ -26,11 +26,14 @@ const createInitialTemplate = () => {
             createBlock('core/columns', {
                 columns: 2,
                 lock: { move: true, remove: true },
-                allowedBlocks: ['core/column']
+                allowedBlocks: ['core/column'],
+                verticalAlignment: 'center'
             }, [
                 createBlock('core/column', {
                     lock: { move: true, remove: true },
-                    allowedBlocks: ['core/image']
+                    allowedBlocks: ['core/image'],
+                    width: 'fit-content',
+                    className: 'author-avatar-column'
                 }, [
                     createBlock('core/image', {
                         url: '',
@@ -42,7 +45,8 @@ const createInitialTemplate = () => {
                 ]),
                 createBlock('core/column', {
                     lock: { move: true, remove: true },
-                    allowedBlocks: ['core/paragraph']
+                    allowedBlocks: ['core/paragraph'],
+                    verticalAlignment: 'center'
                 }, [
                     createBlock('core/paragraph', {
                         content: '',
@@ -61,7 +65,7 @@ const createInitialTemplate = () => {
         }, [
             createBlock('core/paragraph', {
                 content: '',
-                placeholder: 'Add your main content here. You can add any blocks in this section.'
+                placeholder: 'Main content area. Add any blocks in this section.'
             })
         ]),
 
@@ -82,7 +86,7 @@ const createInitialTemplate = () => {
                 }, [
                     createBlock('core/paragraph', {
                         content: '',
-                        placeholder: 'Footer content column 1'
+                        placeholder: 'Footer content'
                     })
                 ]),
                 createBlock('core/column', {
@@ -91,7 +95,7 @@ const createInitialTemplate = () => {
                 }, [
                     createBlock('core/paragraph', {
                         content: '',
-                        placeholder: 'Footer content column 2'
+                        placeholder: 'Footer content'
                     })
                 ])
             ])

@@ -235,7 +235,7 @@ const FrontendEditor = () => {
                             <div className="post-title-section">
                                 <textarea
                                     className="post-title-input"
-                                    placeholder="Add title..."
+                                    placeholder="Title"
                                     value={postTitle}
                                     onChange={(e) => setPostTitle(e.target.value)}
                                     rows={1}
