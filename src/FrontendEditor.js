@@ -30,6 +30,8 @@ const FrontendEditor = () => {
     const [notices, setNotices] = useState([]);
     const [showPostPreview, setShowPostPreview] = useState(false);
     const [publishedPostUrl, setPublishedPostUrl] = useState('');
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [initialContent, setInitialContent] = useState({ blocks: [], title: '' });
 
     // Track current selected block index
     const [currentSelectedBlock, setCurrentSelectedBlock] = useState(-1);
@@ -58,6 +60,18 @@ const FrontendEditor = () => {
         }
     };
 
+    // Check for content changes
+    const checkForChanges = (currentBlocks, currentTitle) => {
+        const currentContent = serialize(currentBlocks);
+        const initialContentSerialized = serialize(initialContent.blocks);
+        
+        const hasChanges = 
+            currentContent !== initialContentSerialized || 
+            currentTitle !== initialContent.title;
+        
+        setHasUnsavedChanges(hasChanges);
+    };
+
     // Use default WordPress registry
 
     useEffect(() => {
@@ -77,17 +91,29 @@ const FrontendEditor = () => {
                 );
 
                 setBlocks(contentBlocks);
+                setInitialContent({ blocks: contentBlocks, title: post.title || '' });
             } else {
                 // Start with template blocks for new posts
-                setBlocks(createInitialTemplate());
+                const templateBlocks = createInitialTemplate();
+                setBlocks(templateBlocks);
+                setInitialContent({ blocks: templateBlocks, title: '' });
             }
         } else {
             // No post data - start with template blocks
             setPostId(0);
             setPostTitle('');
-            setBlocks(createInitialTemplate());
+            const templateBlocks = createInitialTemplate();
+            setBlocks(templateBlocks);
+            setInitialContent({ blocks: templateBlocks, title: '' });
         }
     }, []);
+
+    // Detect changes in blocks
+    useEffect(() => {
+        if (initialContent.blocks.length > 0) {
+            checkForChanges(blocks, postTitle);
+        }
+    }, [blocks, postTitle, initialContent]);
 
     const savePost = async (status = 'draft') => {
         setIsSaving(true);
@@ -139,6 +165,10 @@ const FrontendEditor = () => {
                 if (result.data.post_id && postId === 0) {
                     setPostId(result.data.post_id);
                 }
+                
+                // Reset unsaved changes flag after successful save
+                setHasUnsavedChanges(false);
+                setInitialContent({ blocks: [...blocks], title: postTitle });
                 
                 if (status === 'publish' && result.data.post_url) {
                     setPublishedPostUrl(result.data.post_url);
@@ -331,7 +361,7 @@ const FrontendEditor = () => {
                             variant="secondary"
                             onClick={() => savePost('draft')}
                             isBusy={isSaving}
-                            disabled={isSaving}
+                            disabled={isSaving || !hasUnsavedChanges}
                             className="save-draft-btn"
                         >
                             Save Draft
@@ -340,7 +370,7 @@ const FrontendEditor = () => {
                             variant="primary"
                             onClick={() => savePost('publish')}
                             isBusy={isSaving}
-                            disabled={isSaving}
+                            disabled={isSaving || !hasUnsavedChanges}
                             className="publish-btn"
                         >
                             Publish
