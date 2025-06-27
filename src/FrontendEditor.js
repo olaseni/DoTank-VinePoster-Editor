@@ -48,6 +48,16 @@ const FrontendEditor = () => {
         setNotices(prev => prev.filter(notice => notice.id !== id));
     };
 
+    // Preview handler for sidebar button
+    const handlePreviewClick = () => {
+        if (postId) {
+            // Create the published post URL for preview
+            const previewUrl = `${window.frontendEditorData.homeUrl}?p=${postId}`;
+            setPublishedPostUrl(previewUrl);
+            setShowPostPreview(true);
+        }
+    };
+
     // Use default WordPress registry
 
     useEffect(() => {
@@ -309,6 +319,8 @@ const FrontendEditor = () => {
                                 />
                                 <EditorSidebar
                                     onInsertBlock={handleInsertBlock}
+                                    onPreviewClick={handlePreviewClick}
+                                    postId={postId}
                                 />
                             </BlockEditorProvider>
                         </div>
