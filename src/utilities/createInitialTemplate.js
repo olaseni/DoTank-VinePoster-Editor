@@ -12,7 +12,7 @@ const createInitialTemplate = () => {
         }, [
             createBlock('core/paragraph', {
                 content: '',
-                placeholder: 'Write your description here...',
+                placeholder: 'Short Introduction',
                 fontSize: 'medium'
             })
         ]),

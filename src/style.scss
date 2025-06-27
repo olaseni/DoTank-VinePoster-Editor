@@ -3,91 +3,27 @@
 
 /* Template Region Styling */
 .editable-description {
-    background: #e8f5e8;
-    border: 2px dashed #28a745;
-    border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
     position: relative;
-    
-    &::before {
-        content: "EDITABLE AREA";
-        position: absolute;
-        top: -8px;
-        left: 12px;
-        background: #28a745;
-        color: white;
-        padding: 2px 8px;
-        font-size: 10px;
-        font-weight: bold;
-        border-radius: 4px;
-    }
 }
 
 .template-author {
-    background: #fff3cd;
-    border: 2px solid #ffeaa7;
-    border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
     position: relative;
-    
-    &::before {
-        content: "FIXED STRUCTURE - CONTENT EDITABLE";
-        position: absolute;
-        top: -8px;
-        left: 12px;
-        background: #ffc107;
-        color: #212529;
-        padding: 2px 8px;
-        font-size: 10px;
-        font-weight: bold;
-        border-radius: 4px;
-    }
 }
 
 .editable-main-content {
-    background: #e8f5e8;
-    border: 2px dashed #28a745;
-    border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
     position: relative;
     min-height: 150px;
-    
-    &::before {
-        content: "FULLY EDITABLE CONTENT AREA";
-        position: absolute;
-        top: -8px;
-        left: 12px;
-        background: #28a745;
-        color: white;
-        padding: 2px 8px;
-        font-size: 10px;
-        font-weight: bold;
-        border-radius: 4px;
-    }
 }
 
 .template-footer {
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
     padding: 20px;
     position: relative;
-    
-    &::before {
-        content: "FIXED FOOTER STRUCTURE";
-        position: absolute;
-        top: -8px;
-        left: 12px;
-        background: #6c757d;
-        color: white;
-        padding: 2px 8px;
-        font-size: 10px;
-        font-weight: bold;
-        border-radius: 4px;
-    }
 }
 
 .frontend-editor-content {
