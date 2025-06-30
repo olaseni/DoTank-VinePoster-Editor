@@ -19,7 +19,7 @@ import {
 } from '@wordpress/components';
 import EditorSidebar from './components/EditorSidebar';
 import SelectionChangeWatcher from './components/SelectionChangeWatcher';
-import { mediaUploadUtilityWithNonce, mimeTypeToExtension } from './utilities/mediaUploadUtility';
+import { mediaUploadUtilityWithNonce } from './utilities/mediaUploadUtility';
 import createInitialTemplate from './utilities/createInitialTemplate';
 
 const FrontendEditor = () => {
@@ -64,11 +64,11 @@ const FrontendEditor = () => {
     const checkForChanges = (currentBlocks, currentTitle) => {
         const currentContent = serialize(currentBlocks);
         const initialContentSerialized = serialize(initialContent.blocks);
-        
-        const hasChanges = 
-            currentContent !== initialContentSerialized || 
+
+        const hasChanges =
+            currentContent !== initialContentSerialized ||
             currentTitle !== initialContent.title;
-        
+
         setHasUnsavedChanges(hasChanges);
     };
 
@@ -165,11 +165,11 @@ const FrontendEditor = () => {
                 if (result.data.post_id && postId === 0) {
                     setPostId(result.data.post_id);
                 }
-                
+
                 // Reset unsaved changes flag after successful save
                 setHasUnsavedChanges(false);
                 setInitialContent({ blocks: [...blocks], title: postTitle });
-                
+
                 if (status === 'publish' && result.data.post_url) {
                     setPublishedPostUrl(result.data.post_url);
                     addNotice('Post published successfully!', 'success', [
@@ -197,22 +197,22 @@ const FrontendEditor = () => {
     // Function to insert a new block at the current position (column/group containers only)
     const handleInsertBlock = (newBlock) => {
         const currentSelectedBlockClientId = currentSelectedBlock?.clientId;
-        
+
         if (currentSelectedBlockClientId) {
             // Only allow insertion in column and group containers
             const allowedContainerTypes = ['core/column', 'core/group'];
             const containerOfContainerTypes = ['core/columns'];
-            
+
             // Search for the selected block and handle insertion
             const findAndInsertInContainer = (blocksArray) => {
                 for (let i = 0; i < blocksArray.length; i++) {
                     const block = blocksArray[i];
-                    
+
                     // Check if the selected block IS this container of containers (e.g., columns)
-                    if (block.clientId === currentSelectedBlockClientId && 
+                    if (block.clientId === currentSelectedBlockClientId &&
                         containerOfContainerTypes.includes(block.name) &&
                         block.innerBlocks && block.innerBlocks.length > 0) {
-                        
+
                         // Find the first sub-container (e.g., first column)
                         const firstSubContainer = block.innerBlocks[0];
                         if (firstSubContainer && allowedContainerTypes.includes(firstSubContainer.name)) {
@@ -221,48 +221,48 @@ const FrontendEditor = () => {
                                 ...firstSubContainer,
                                 innerBlocks: [...firstSubContainer.innerBlocks, newBlock]
                             };
-                            
+
                             const updatedInnerBlocks = [...block.innerBlocks];
                             updatedInnerBlocks[0] = updatedFirstSubContainer;
-                            
+
                             const updatedBlock = {
                                 ...block,
                                 innerBlocks: updatedInnerBlocks
                             };
-                            
+
                             const updatedBlocks = [...blocksArray];
                             updatedBlocks[i] = updatedBlock;
-                            
+
                             return updatedBlocks;
                         }
                     }
-                    
+
                     // Check if selected block is in this container's inner blocks
-                    if (block.innerBlocks && block.innerBlocks.length > 0 && 
+                    if (block.innerBlocks && block.innerBlocks.length > 0 &&
                         allowedContainerTypes.includes(block.name)) {
                         const innerBlockIndex = block.innerBlocks.findIndex(
                             innerBlock => innerBlock.clientId === currentSelectedBlockClientId
                         );
-                        
+
                         if (innerBlockIndex !== -1) {
                             // Found the selected block in this container, insert after it
                             const updatedInnerBlocks = [...block.innerBlocks];
                             updatedInnerBlocks.splice(innerBlockIndex + 1, 0, newBlock);
-                            
+
                             // Update the parent block with new inner blocks
                             const updatedBlock = {
                                 ...block,
                                 innerBlocks: updatedInnerBlocks
                             };
-                            
+
                             // Update the main blocks array
                             const updatedBlocks = [...blocksArray];
                             updatedBlocks[i] = updatedBlock;
-                            
+
                             return updatedBlocks;
                         }
                     }
-                    
+
                     // Recursively search deeper nested blocks
                     if (block.innerBlocks && block.innerBlocks.length > 0) {
                         const nestedResult = findAndInsertInContainer(block.innerBlocks);
@@ -279,7 +279,7 @@ const FrontendEditor = () => {
                 }
                 return null;
             };
-            
+
             const updatedBlocks = findAndInsertInContainer(blocks);
             if (updatedBlocks) {
                 setBlocks(updatedBlocks);
@@ -325,10 +325,9 @@ const FrontendEditor = () => {
                                     canUserUseUnfilteredHTML: true,
                                     __experimentalCanUserUseUnfilteredHTML: true,
                                     mediaUpload: mediaUploadUtilityWithNonce(window?.frontendEditorData?.nonce),
-                                    allowedMimeTypes: mimeTypeToExtension,
                                     allowedBlockTypes: [
                                         'core/video',
-                                        'core/image', 
+                                        'core/image',
                                         'core/columns',
                                         'core/column',
                                         'core/group',
@@ -378,7 +377,7 @@ const FrontendEditor = () => {
                     </div>
 
                     <Popover.Slot />
-                    
+
                     {/* Notice System */}
                     <div className="editor-notices">
                         {notices.map((notice) => (
@@ -395,7 +394,7 @@ const FrontendEditor = () => {
 
                     {/* Post Preview Modal */}
                     {showPostPreview && publishedPostUrl && (
-                        <div 
+                        <div
                             className="post-preview-modal-overlay"
                             onClick={(e) => {
                                 if (e.target === e.currentTarget) {
