@@ -5,6 +5,7 @@ const createInitialTemplate = () => {
     return [
         // FIXED: Author section structure (locked, but content editable)
         createBlock('core/group', {
+            layout: { type: 'constrained' },
             className: 'template-author',
             lock: { move: true, remove: true },
             templateLock: 'insert'
@@ -44,54 +45,45 @@ const createInitialTemplate = () => {
 
         // EDITABLE: Description section
         createBlock('core/group', {
+            layout: { type: 'constrained' },
             className: 'editable-description',
             lock: { move: true, remove: true },
             templateLock: false,
-            allowedBlocks: ['core/paragraph', 'core/image']
+            allowedBlocks: ['core/paragraph', 'core/image'],
         }, [
             createBlock('core/paragraph', {
-                content: '',
-                placeholder: 'Short Introduction',
-                fontSize: 'medium'
+                placeholder: 'Short Introduction'
             })
         ]),        
 
         // EDITABLE: Main content area (completely flexible)
         createBlock('core/group', {
+            layout: { type: 'constrained' },
             className: 'editable-main-content',
             lock: { move: true, remove: true },
             templateLock: false,
             allowedBlocks: ['core/paragraph', 'core/image', 'core/video', 'core/button', 'core/columns', 'core/group']
         }, [
             createBlock('core/paragraph', {
-                content: '',
-                placeholder: 'Main content area. Add any blocks in this section.'
+                placeholder: 'Main content area'
             })
         ]),
 
         // FIXED: Footer columns (structure locked, content editable)
         createBlock('core/group', {
+            layout: { type: 'constrained' },
             className: 'template-footer',
             lock: { move: true, remove: true },
             templateLock: 'insert'
         }, [
             createBlock('core/columns', {
-                columns: 2,
+                columns: 1,
                 lock: { move: true, remove: true },
                 allowedBlocks: ['core/column']
             }, [
                 createBlock('core/column', {
-                    lock: { move: true, remove: true },
-                    allowedBlocks: ['core/paragraph', 'core/button']
-                }, [
-                    createBlock('core/paragraph', {
-                        content: '',
-                        placeholder: 'Footer content'
-                    })
-                ]),
-                createBlock('core/column', {
-                    lock: { move: true, remove: true },
-                    allowedBlocks: ['core/paragraph', 'core/button']
+                    lock: { move: false, remove: false },
+                    allowedBlocks: ['core/paragraph', 'core/button'],
                 }, [
                     createBlock('core/paragraph', {
                         content: '',
