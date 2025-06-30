@@ -103,7 +103,7 @@ class ContentManager
             'show_in_menu' => true,
             'supports' => ['title', 'editor', 'custom-fields', 'revisions'],
             'menu_icon' => 'dashicons-edit-page',
-            'template' => [
+            /* 'template' => [
                 ['core/paragraph', [
                     'placeholder' => 'A short description'
                 ]],
@@ -117,7 +117,7 @@ class ContentManager
                 ],
                 ['core/image', ['placeholder' => 'Featured Image']],
             ],
-            'template_lock' => 'insert',
+            'template_lock' => 'insert', */
         ]);
     }
 

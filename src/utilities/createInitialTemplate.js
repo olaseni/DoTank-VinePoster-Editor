@@ -54,7 +54,7 @@ const createInitialTemplate = () => {
             createBlock('core/paragraph', {
                 placeholder: 'Short Introduction'
             })
-        ]),        
+        ]),
 
         // EDITABLE: Main content area (completely flexible)
         createBlock('core/group', {
@@ -62,7 +62,7 @@ const createInitialTemplate = () => {
             className: 'editable-main-content',
             lock: { move: true, remove: true },
             templateLock: false,
-            allowedBlocks: ['core/paragraph', 'core/image', 'core/video', 'core/button', 'core/columns', 'core/group']
+            allowedBlocks: ['core/paragraph', 'core/image', 'core/video', 'core/button', 'core/buttons', 'core/columns', 'core/group']
         }, [
             createBlock('core/paragraph', {
                 placeholder: 'Main content area'

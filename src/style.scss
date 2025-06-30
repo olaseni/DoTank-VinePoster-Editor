@@ -9,6 +9,7 @@
 
 .template-author {
     padding: 0 20px;
+    margin-bottom: 1em;
 }
 
 .author-avatar-column {
@@ -51,10 +52,14 @@
             -webkit-appearance: none;
             min-height: 3.5rem;
             overflow: hidden;
+            max-width: 645px;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            display: block;
             
             &::placeholder {
-                color: rgba(30, 30, 30, 0.62);
-                font-weight: 700;
+                color: rgba(75, 74, 74, 0.62);
+                font-weight: 500;
             }
             
             &:focus {

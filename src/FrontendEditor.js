@@ -332,7 +332,8 @@ const FrontendEditor = () => {
                                         'core/column',
                                         'core/group',
                                         'core/paragraph',
-                                        'core/button'
+                                        'core/button',
+                                        'core/buttons',
                                     ]
                                 }}
                             >
