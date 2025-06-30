@@ -64,6 +64,7 @@ class ContentManager
         add_action('wp_ajax_save_post_content', [$this, 'ajax_save_post_content']);
         add_action('wp_ajax_nopriv_publish_post_content', [$this, 'ajax_publish_post_content']);
         add_action('wp_ajax_publish_post_content', [$this, 'ajax_publish_post_content']);
+        add_filter('wp_prevent_unsupported_mime_type_uploads', '__return_false');
     }
 
     public function loadIsoGutenberg()
@@ -87,7 +88,7 @@ class ContentManager
     {
         $this->disable_admin_bar_on_request();
         $this->loadIsoGutenberg();
-        unregister_block_pattern( 'twentytwentyfive/hidden-written-by' );
+        unregister_block_pattern('twentytwentyfive/hidden-written-by');
 
         register_post_type('managed_content', [
             'labels' => [
@@ -235,7 +236,7 @@ class ContentManager
         wp_enqueue_style(
             'frontend-editor-global',
             plugin_dir_url(__FILE__) . 'build/style-index.css'
-        );        
+        );
     }
 
     public function enqueue_frontend_editor_assets()
