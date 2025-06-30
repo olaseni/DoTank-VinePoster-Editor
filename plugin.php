@@ -289,6 +289,7 @@ class ContentManager
             'restUrl' => rest_url(),
             'mediaUrl' => rest_url('wp/v2/media'),
             'homeUrl' => home_url(),
+            'previewUrl' => home_url() . '?post_type=managed_content&show_admin_bar=false',
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'postData' => [],
             'nonce' => wp_create_nonce('wp_rest'),

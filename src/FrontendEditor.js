@@ -32,6 +32,7 @@ const FrontendEditor = () => {
     const [publishedPostUrl, setPublishedPostUrl] = useState('');
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const [initialContent, setInitialContent] = useState({ blocks: [], title: '' });
+    const [postStatus, setPostStatus] = useState('draft');
 
     // Track current selected block index
     const [currentSelectedBlock, setCurrentSelectedBlock] = useState(-1);
@@ -53,8 +54,10 @@ const FrontendEditor = () => {
     // Preview handler for sidebar button
     const handlePreviewClick = () => {
         if (postId) {
-            // Create the published post URL for preview
-            const previewUrl = `${window.frontendEditorData.homeUrl}?p=${postId}`;
+            let previewUrl = `${window.frontendEditorData.previewUrl}&p=${postId}`;
+            if (postStatus === 'draft') {
+                previewUrl += '&preview=true';
+            }
             setPublishedPostUrl(previewUrl);
             setShowPostPreview(true);
         }
@@ -80,6 +83,7 @@ const FrontendEditor = () => {
             const post = window.frontendEditorData.postData;
             setPostId(post.id || 0);
             setPostTitle(post.title || '');
+            setPostStatus(post.status || 'draft');
 
             // Parse existing content into blocks
             if (post.content) {
@@ -171,6 +175,7 @@ const FrontendEditor = () => {
                 setInitialContent({ blocks: [...blocks], title: postTitle });
 
                 if (status === 'publish' && result.data.post_url) {
+                    setPostStatus('publish');
                     setPublishedPostUrl(result.data.post_url);
                     addNotice('Post published successfully!', 'success', [
                         {
@@ -181,6 +186,7 @@ const FrontendEditor = () => {
                         }
                     ]);
                 } else {
+                    setPostStatus('draft');
                     addNotice('Draft saved successfully.', 'success');
                 }
             } else {
@@ -398,7 +404,7 @@ const FrontendEditor = () => {
                         <div className="post-preview-modal">
                             <div className="post-preview-content">
                                 <iframe
-                                    src={`${publishedPostUrl}${publishedPostUrl.includes('?') ? '&' : '?'}show_admin_bar=false`}
+                                    src={publishedPostUrl}
                                     frameBorder="0"
                                     title="Published Post Preview"
                                 />
