@@ -4,7 +4,8 @@
     "start": "wp-scripts start"
   },
   "devDependencies": {
-    "@wordpress/scripts": "^30.18.0"
+    "@wordpress/scripts": "^30.18.0",
+    "webpack-remove-empty-scripts": "^1.1.1"
   },
   "nx": {}
 }

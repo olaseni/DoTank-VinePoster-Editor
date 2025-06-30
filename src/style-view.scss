@@ -1,0 +1,44 @@
+/* Frontend List Styles - Only applies when not in editor mode */
+body:not(.block-editor-page) {
+
+  .wp-site-blocks {
+    p, ul li {
+      font-size: var(--wp--preset--font-size--medium);
+    }
+
+    .wp-block-list,
+    ol,
+    ul {
+      margin: 1em 0;
+      padding-left: 2em;
+    }
+
+    .wp-block-list ul,
+    ul {
+      list-style-type: disc;
+    }
+
+    .wp-block-list ol,
+    ol {
+      list-style-type: decimal;
+    }
+
+    .wp-block-list li,
+    li {
+      margin-bottom: 0.5em;
+    }
+
+    /* Nested list styles */
+    .wp-block-list ul ul,
+    ul ul {
+      list-style-type: circle;
+    }
+
+    .wp-block-list ul ul ul,
+    ul ul ul {
+      list-style-type: square;
+    }
+
+  }
+
+}

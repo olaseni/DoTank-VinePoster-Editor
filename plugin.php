@@ -234,8 +234,13 @@ class ContentManager
         }
 
         wp_enqueue_style(
-            'frontend-editor-global',
-            plugin_dir_url(__FILE__) . 'build/style-index.css'
+            'frontend-editor-index',
+            plugin_dir_url(__FILE__) . 'build/index.css'
+        );
+
+        wp_enqueue_style(
+            'frontend-editor-views',
+            plugin_dir_url(__FILE__) . 'build/style-views.css'
         );
     }
 
@@ -262,16 +267,16 @@ class ContentManager
 
         // Enqueue our custom styles
         wp_enqueue_style(
-            'frontend-editor-core',
-            plugin_dir_url(__FILE__) . 'build/index.css',
+            'frontend-editor-blocks-core',
+            plugin_dir_url(__FILE__) . 'build/style-blocks-combined.css',
             [],
             $asset['version']
         );
-        
+
         // Enqueue our custom styles
         wp_enqueue_style(
             'frontend-editor',
-            plugin_dir_url(__FILE__) . 'build/style-index.css',
+            plugin_dir_url(__FILE__) . 'build/index.css',
             ['wp-edit-post', 'wp-block-editor', 'wp-components', 'wp-block-library', 'wp-block-library-theme', 'wp-edit-blocks', 'common'],
             $asset['version']
         );

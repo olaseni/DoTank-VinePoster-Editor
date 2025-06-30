@@ -2,9 +2,13 @@ default:
     @echo  "Usage: just <target>"
     @just --list
 
-clean:
+clean-build:
+    unlink src/style-blocks-combined.scss &> /dev/null
     npm cache clean --force &> /dev/null
-    rm -rf node_modules package-lock.json build
+    rm -rf build
+
+clean: clean-build
+    rm -rf node_modules package-lock.json
     rm -fr ~/.wp-now
 
 install: clean
@@ -65,4 +69,4 @@ git-push:
 
 # Combine Gutenberg block styles
 combine-block-css:
-    php -r 'require "includes/Utilities.php"; Utilities::combineBlockStyles("src-wordpress/wp-includes/blocks", "src/combined-block-styles.scss");'
+    php -r 'require "includes/Utilities.php"; Utilities::combineBlockStyles("src-wordpress/wp-includes/blocks", "src/style-blocks-combined.scss");'
