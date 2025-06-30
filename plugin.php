@@ -257,10 +257,13 @@ class ContentManager
 
         self::log('Asset data: ' . print_r($asset, true));
 
+        // Enqueue media scripts for the media modal
+        wp_enqueue_media();
+        
         wp_enqueue_script(
             'frontend-editor',
             plugin_dir_url(__FILE__) . 'build/index.js',
-            $asset['dependencies'],
+            array_merge($asset['dependencies'], ['media-editor', 'media-views']),
             $asset['version'],
             true
         );
