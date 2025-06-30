@@ -64,7 +64,6 @@ class ContentManager
         add_action('wp_ajax_save_post_content', [$this, 'ajax_save_post_content']);
         add_action('wp_ajax_nopriv_publish_post_content', [$this, 'ajax_publish_post_content']);
         add_action('wp_ajax_publish_post_content', [$this, 'ajax_publish_post_content']);
-        add_filter('wp_check_filetype_and_ext', [$this, 'check_filetype_and_ext'], 10, 5);
     }
 
     public function loadIsoGutenberg()
@@ -405,23 +404,6 @@ class ContentManager
                 'post_url' => $post_url
             ]
         ]));
-    }
-
-    public function check_filetype_and_ext($data, $file, $filename, $mimes, $real_mime = null)
-    {
-        // Allow common image extensions
-        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        $file_ext = pathinfo($filename, PATHINFO_EXTENSION);
-
-        if (in_array(strtolower($file_ext), $allowed_extensions)) {
-            // Override WordPress restrictions for these image types
-            $data['ext'] = $file_ext;
-            $data['type'] = 'image/' . ($file_ext === 'jpg' ? 'jpeg' : $file_ext);
-            $data['proper_filename'] = $filename;
-        }
-
-        self::log('check_filetype_and_ext called', 'File: ' . $filename, 'Data: ' . print_r($data, true));
-        return $data;
     }
 
     public function is_frontend_editor_request()

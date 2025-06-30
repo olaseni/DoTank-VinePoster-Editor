@@ -1,8 +1,62 @@
 import { Button, Panel, PanelBody, PanelRow } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 
-const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId }) => {
+const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId, currentSelectedBlock, blocks }) => {
     
+    // Helper function to find a block by clientId in the blocks tree
+    const findBlockByClientId = (clientId, blocksArray) => {
+        for (const block of blocksArray) {
+            if (block.clientId === clientId) {
+                return block;
+            }
+            if (block.innerBlocks && block.innerBlocks.length > 0) {
+                const found = findBlockByClientId(clientId, block.innerBlocks);
+                if (found) return found;
+            }
+        }
+        return null;
+    };
+
+    // Helper function to find the parent container of a selected block
+    const findParentContainer = (selectedClientId, blocksArray, parent = null) => {
+        for (const block of blocksArray) {
+            if (block.clientId === selectedClientId) {
+                return parent;
+            }
+            if (block.innerBlocks && block.innerBlocks.length > 0) {
+                const found = findParentContainer(selectedClientId, block.innerBlocks, block);
+                if (found !== null) return found;
+            }
+        }
+        return null;
+    };
+
+    // Check if a block type is allowed in the current context
+    const isBlockTypeAllowed = (blockType) => {
+        if (!currentSelectedBlock?.clientId) return false;
+
+        // Find the parent container
+        const parentContainer = findParentContainer(currentSelectedBlock.clientId, blocks);
+        
+        if (!parentContainer) return false;
+
+        // Check if parent container is locked
+        if (parentContainer.attributes?.templateLock === 'all' || 
+            parentContainer.attributes?.templateLock === 'insert') {
+            return false;
+        }
+
+        // Check allowedBlocks
+        const allowedBlocks = parentContainer.attributes?.allowedBlocks;
+        if (allowedBlocks && Array.isArray(allowedBlocks)) {
+            return allowedBlocks.includes(blockType);
+        }
+
+        // If no allowedBlocks restriction, allow insertion in editable containers
+        const editableContainers = ['core/group', 'core/column'];
+        return editableContainers.includes(parentContainer.name);
+    };
+
     const handleInsertBlock = (blockType, attributes = {}) => {
         let newBlock;
         
@@ -73,18 +127,18 @@ const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId }) => {
                 <PanelBody title="Columns" initialOpen={true}>
                     <div className="columns-grid">
                         <div 
-                            className="column-option"
-                            title="Single Column"
-                            onClick={() => handleInsertBlock('core/columns', { columns: 1 })}
+                            className={`column-option ${!isBlockTypeAllowed('core/columns') ? 'disabled' : ''}`}
+                            title={isBlockTypeAllowed('core/columns') ? "Single Column" : "Not allowed in this context"}
+                            onClick={() => isBlockTypeAllowed('core/columns') && handleInsertBlock('core/columns', { columns: 1 })}
                         >
                             <div className="column-preview single-column">
                                 <div className="column-bar"></div>
                             </div>
                         </div>
                         <div 
-                            className="column-option"
-                            title="Two Columns"
-                            onClick={() => handleInsertBlock('core/columns', { columns: 2 })}
+                            className={`column-option ${!isBlockTypeAllowed('core/columns') ? 'disabled' : ''}`}
+                            title={isBlockTypeAllowed('core/columns') ? "Two Columns" : "Not allowed in this context"}
+                            onClick={() => isBlockTypeAllowed('core/columns') && handleInsertBlock('core/columns', { columns: 2 })}
                         >
                             <div className="column-preview double-column">
                                 <div className="column-bar"></div>
@@ -97,18 +151,18 @@ const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId }) => {
                 <PanelBody title="Blocks" initialOpen={true}>
                     <div className="blocks-grid">
                         <div 
-                            className="block-option" 
-                            title="Text Block"
-                            onClick={() => handleInsertBlock('core/paragraph', { placeholder: 'Start writing...' })}
+                            className={`block-option ${!isBlockTypeAllowed('core/paragraph') ? 'disabled' : ''}`}
+                            title={isBlockTypeAllowed('core/paragraph') ? "Text Block" : "Not allowed in this context"}
+                            onClick={() => isBlockTypeAllowed('core/paragraph') && handleInsertBlock('core/paragraph', { placeholder: 'Start writing...' })}
                         >
                             <div className="block-icon text-icon">
                                 <span>A</span>
                             </div>
                         </div>
                         <div 
-                            className="block-option" 
-                            title="Image Block"
-                            onClick={() => handleInsertBlock('core/image', { caption: '' })}
+                            className={`block-option ${!isBlockTypeAllowed('core/image') ? 'disabled' : ''}`}
+                            title={isBlockTypeAllowed('core/image') ? "Image Block" : "Not allowed in this context"}
+                            onClick={() => isBlockTypeAllowed('core/image') && handleInsertBlock('core/image', { caption: '' })}
                         >
                             <div className="block-icon image-icon">
                                 <svg viewBox="0 0 24 24" width="16" height="16">
@@ -117,9 +171,9 @@ const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId }) => {
                             </div>
                         </div>
                         <div 
-                            className="block-option" 
-                            title="Media Block"
-                            onClick={() => handleInsertBlock('core/video', {})}
+                            className={`block-option ${!isBlockTypeAllowed('core/video') ? 'disabled' : ''}`}
+                            title={isBlockTypeAllowed('core/video') ? "Media Block" : "Not allowed in this context"}
+                            onClick={() => isBlockTypeAllowed('core/video') && handleInsertBlock('core/video', {})}
                         >
                             <div className="block-icon media-icon">
                                 <svg viewBox="0 0 24 24" width="16" height="16">
@@ -128,9 +182,9 @@ const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId }) => {
                             </div>
                         </div>
                         <div 
-                            className="block-option" 
-                            title="Button Block"
-                            onClick={() => handleInsertBlock('core/button', { text: 'Click me', url: '' })}
+                            className={`block-option ${!isBlockTypeAllowed('core/button') ? 'disabled' : ''}`}
+                            title={isBlockTypeAllowed('core/button') ? "Button Block" : "Not allowed in this context"}
+                            onClick={() => isBlockTypeAllowed('core/button') && handleInsertBlock('core/button', { text: 'Click me', url: '' })}
                         >
                             <div className="block-icon button-icon">
                                 <span>Button</span>

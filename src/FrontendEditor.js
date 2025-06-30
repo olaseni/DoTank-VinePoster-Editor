@@ -351,6 +351,8 @@ const FrontendEditor = () => {
                                     onInsertBlock={handleInsertBlock}
                                     onPreviewClick={handlePreviewClick}
                                     postId={postId}
+                                    currentSelectedBlock={currentSelectedBlock}
+                                    blocks={blocks}
                                 />
                             </BlockEditorProvider>
                         </div>

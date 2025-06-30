@@ -22,10 +22,6 @@ const allowedMimeTypes = Object.entries(mimeTypeToExtension).reduce((acc, [mime,
 const mediaUploadUtility = ({ filesList, onFileChange, allowedTypes, onError, nonce }) => {
     console.log('Media upload called with:', { filesList, allowedTypes });
 
-    // Handle allowedTypes being undefined by using image types
-    const types = allowedTypes || ['image'];
-    console.log('Using allowedTypes:', types);
-
     uploadMedia({
         filesList,
         onFileChange: (media) => {
@@ -36,7 +32,6 @@ const mediaUploadUtility = ({ filesList, onFileChange, allowedTypes, onError, no
                 onFileChange([media]);
             }
         },
-        allowedTypes: types,
         onError: (error) => {
             console.error('Upload error:', error);
             if (onError) {
@@ -45,7 +40,6 @@ const mediaUploadUtility = ({ filesList, onFileChange, allowedTypes, onError, no
                 alert('Upload failed: ' + (error.message || error));
             }
         },
-        wpAllowedMimeTypes: allowedMimeTypes,
         additionalData: {
             _wpnonce: nonce ?? null
         }

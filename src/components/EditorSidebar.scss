@@ -74,9 +74,19 @@
         background: white;
         transition: all 0.2s ease;
 
-        &:hover {
+        &:hover:not(.disabled) {
             border-color: #0073aa;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        &.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #f5f5f5;
+            
+            .column-bar {
+                background: #ccc !important;
+            }
         }
     }
 
@@ -125,9 +135,19 @@
         transition: all 0.2s ease;
         min-height: 48px;
 
-        &:hover {
+        &:hover:not(.disabled) {
             border-color: #0073aa;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        &.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #f5f5f5;
+            
+            .block-icon {
+                color: #bbb !important;
+            }
         }
     }
 

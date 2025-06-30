@@ -7,9 +7,6 @@ import './combined-block-styles.scss';
 // Register all core blocks
 registerCoreBlocks();
 
-console.log('Frontend Editor: Initializing full Gutenberg editor');
-console.log('Frontend Editor Data:', window.frontendEditorData);
-
 const editorRoot = document.getElementById('frontend-editor-root');
 
 if (editorRoot && window.frontendEditorData) {
