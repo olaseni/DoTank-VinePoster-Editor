@@ -13,7 +13,6 @@ import { select, dispatch, useSelect } from '@wordpress/data';
 import {
     Button,
     SlotFillProvider,
-    DropZoneProvider,
     Popover,
     Snackbar
 } from '@wordpress/components';
@@ -294,138 +293,136 @@ const FrontendEditor = () => {
 
     return (
         <SlotFillProvider>
-            <DropZoneProvider>
-                <div className="frontend-gutenberg-editor has-sidebar">
+            <div className="frontend-gutenberg-editor has-sidebar">
 
-                    <div className="frontend-editor-content">
-                        <div className="frontend-editor-blocks">
-                            {/* Dedicated Title Input */}
-                            <div className="post-title-section">
-                                <textarea
-                                    className="post-title-input"
-                                    placeholder="Title"
-                                    value={postTitle}
-                                    onChange={(e) => setPostTitle(e.target.value)}
-                                    rows={1}
-                                    onInput={(e) => {
-                                        e.target.style.height = 'auto';
-                                        e.target.style.height = e.target.scrollHeight + 'px';
-                                    }}
-                                />
-                            </div>
-
-                            <BlockEditorProvider
-                                value={blocks}
-                                onInput={setBlocks}
-                                onChange={setBlocks}
-                                settings={{
-                                    hasFixedToolbar: false,
-                                    focusMode: false,
-                                    hasReducedUI: false,
-                                    canUserUseUnfilteredHTML: true,
-                                    __experimentalCanUserUseUnfilteredHTML: true,
-                                    mediaUpload: mediaUploadUtilityWithNonce(window?.frontendEditorData?.nonce),
-                                    allowedBlockTypes: [
-                                        'core/video',
-                                        'core/image',
-                                        'core/columns',
-                                        'core/column',
-                                        'core/group',
-                                        'core/paragraph',
-                                        'core/button',
-                                        'core/buttons',
-                                    ]
+                <div className="frontend-editor-content">
+                    <div className="frontend-editor-blocks">
+                        {/* Dedicated Title Input */}
+                        <div className="post-title-section">
+                            <textarea
+                                className="post-title-input"
+                                placeholder="Title"
+                                value={postTitle}
+                                onChange={(e) => setPostTitle(e.target.value)}
+                                rows={1}
+                                onInput={(e) => {
+                                    e.target.style.height = 'auto';
+                                    e.target.style.height = e.target.scrollHeight + 'px';
                                 }}
-                            >
-                                <BlockTools>
-                                    <WritingFlow>
-                                        <ObserveTyping>
-                                            <BlockList />
-                                        </ObserveTyping>
-                                    </WritingFlow>
-                                </BlockTools>
-                                <SelectionChangeWatcher
-                                    onSelectionChange={setCurrentSelectedBlock}
-                                />
-                                <EditorSidebar
-                                    onInsertBlock={handleInsertBlock}
-                                    onPreviewClick={handlePreviewClick}
-                                    postId={postId}
-                                    currentSelectedBlock={currentSelectedBlock}
-                                    blocks={blocks}
-                                />
-                            </BlockEditorProvider>
+                            />
                         </div>
-                    </div>
 
-                    <div className="frontend-editor-footer">
-                        <Button
-                            variant="secondary"
-                            onClick={() => savePost('draft')}
-                            isBusy={isSaving}
-                            disabled={isSaving || !hasUnsavedChanges}
-                            className="save-draft-btn"
-                        >
-                            Save Draft
-                        </Button>
-                        <Button
-                            variant="primary"
-                            onClick={() => savePost('publish')}
-                            isBusy={isSaving}
-                            disabled={isSaving || !hasUnsavedChanges}
-                            className="publish-btn"
-                        >
-                            Publish
-                        </Button>
-                    </div>
-
-                    <Popover.Slot />
-
-                    {/* Notice System */}
-                    <div className="editor-notices">
-                        {notices.map((notice) => (
-                            <Snackbar
-                                key={notice.id}
-                                className={`editor-notice editor-notice--${notice.type}`}
-                                onRemove={() => removeNotice(notice.id)}
-                                actions={notice.actions}
-                            >
-                                {notice.message}
-                            </Snackbar>
-                        ))}
-                    </div>
-
-                    {/* Post Preview Modal */}
-                    {showPostPreview && publishedPostUrl && (
-                        <div
-                            className="post-preview-modal-overlay"
-                            onClick={(e) => {
-                                if (e.target === e.currentTarget) {
-                                    setShowPostPreview(false);
-                                }
+                        <BlockEditorProvider
+                            value={blocks}
+                            onInput={setBlocks}
+                            onChange={setBlocks}
+                            settings={{
+                                hasFixedToolbar: false,
+                                focusMode: false,
+                                hasReducedUI: false,
+                                canUserUseUnfilteredHTML: true,
+                                __experimentalCanUserUseUnfilteredHTML: true,
+                                mediaUpload: mediaUploadUtilityWithNonce(window?.frontendEditorData?.nonce),
+                                allowedBlockTypes: [
+                                    'core/video',
+                                    'core/image',
+                                    'core/columns',
+                                    'core/column',
+                                    'core/group',
+                                    'core/paragraph',
+                                    'core/button',
+                                    'core/buttons',
+                                ]
                             }}
                         >
-                            <div className="post-preview-modal">
-                                <div className="post-preview-content">
-                                    <iframe
-                                        src={`${publishedPostUrl}${publishedPostUrl.includes('?') ? '&' : '?'}show_admin_bar=false`}
-                                        frameBorder="0"
-                                        title="Published Post Preview"
-                                    />
-                                </div>
-                                <div className="post-preview-footer">
-                                    <Button
-                                        variant="secondary"
-                                        onClick={() => setShowPostPreview(false)}
-                                    >
-                                        Close
-                                    </Button>
-                                </div>
+                            <BlockTools>
+                                <WritingFlow>
+                                    <ObserveTyping>
+                                        <BlockList />
+                                    </ObserveTyping>
+                                </WritingFlow>
+                            </BlockTools>
+                            <SelectionChangeWatcher
+                                onSelectionChange={setCurrentSelectedBlock}
+                            />
+                            <EditorSidebar
+                                onInsertBlock={handleInsertBlock}
+                                onPreviewClick={handlePreviewClick}
+                                postId={postId}
+                                currentSelectedBlock={currentSelectedBlock}
+                                blocks={blocks}
+                            />
+                        </BlockEditorProvider>
+                    </div>
+                </div>
+
+                <div className="frontend-editor-footer">
+                    <Button
+                        variant="secondary"
+                        onClick={() => savePost('draft')}
+                        isBusy={isSaving}
+                        disabled={isSaving || !hasUnsavedChanges}
+                        className="save-draft-btn"
+                    >
+                        Save Draft
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={() => savePost('publish')}
+                        isBusy={isSaving}
+                        disabled={isSaving || !hasUnsavedChanges}
+                        className="publish-btn"
+                    >
+                        Publish
+                    </Button>
+                </div>
+
+                <Popover.Slot />
+
+                {/* Notice System */}
+                <div className="editor-notices">
+                    {notices.map((notice) => (
+                        <Snackbar
+                            key={notice.id}
+                            className={`editor-notice editor-notice--${notice.type}`}
+                            onRemove={() => removeNotice(notice.id)}
+                            actions={notice.actions}
+                        >
+                            {notice.message}
+                        </Snackbar>
+                    ))}
+                </div>
+
+                {/* Post Preview Modal */}
+                {showPostPreview && publishedPostUrl && (
+                    <div
+                        className="post-preview-modal-overlay"
+                        onClick={(e) => {
+                            if (e.target === e.currentTarget) {
+                                setShowPostPreview(false);
+                            }
+                        }}
+                    >
+                        <div className="post-preview-modal">
+                            <div className="post-preview-content">
+                                <iframe
+                                    src={`${publishedPostUrl}${publishedPostUrl.includes('?') ? '&' : '?'}show_admin_bar=false`}
+                                    frameBorder="0"
+                                    title="Published Post Preview"
+                                />
+                            </div>
+                            <div className="post-preview-footer">
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => setShowPostPreview(false)}
+                                >
+                                    Close
+                                </Button>
                             </div>
                         </div>
-                    )}
-                </div>
-            </DropZoneProvider>
+                    </div>
+                )}
+            </div>
         </SlotFillProvider>
     );
 };
