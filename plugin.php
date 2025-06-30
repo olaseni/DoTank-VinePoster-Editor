@@ -58,12 +58,12 @@ class ContentManager
         add_action('rest_api_init', [$this, 'register_rest_routes']);
         add_action('save_post_managed_content', [$this, 'calculate_read_time'], 10, 3);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_editor_assets']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_global_assets']);
         add_action('wp_print_scripts', [$this, 'debug_enqueued_scripts']);
         add_action('wp_ajax_nopriv_save_post_content', [$this, 'ajax_save_post_content']);
         add_action('wp_ajax_save_post_content', [$this, 'ajax_save_post_content']);
         add_action('wp_ajax_nopriv_publish_post_content', [$this, 'ajax_publish_post_content']);
         add_action('wp_ajax_publish_post_content', [$this, 'ajax_publish_post_content']);
-        add_filter('upload_mimes', [$this, 'allow_upload_mimes']);
         add_filter('wp_check_filetype_and_ext', [$this, 'check_filetype_and_ext'], 10, 5);
     }
 
@@ -88,6 +88,7 @@ class ContentManager
     {
         $this->disable_admin_bar_on_request();
         $this->loadIsoGutenberg();
+        unregister_block_pattern( 'twentytwentyfive/hidden-written-by' );
 
         register_post_type('managed_content', [
             'labels' => [
@@ -224,6 +225,18 @@ class ContentManager
             include plugin_dir_path(__FILE__) . 'includes/frontend-sample.php';
             exit;
         }
+    }
+
+    public function enqueue_global_assets()
+    {
+        if ($this->isFrontendEditorEnabled) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'frontend-editor-global',
+            plugin_dir_url(__FILE__) . 'build/style-index.css'
+        );        
     }
 
     public function enqueue_frontend_editor_assets()
@@ -392,19 +405,6 @@ class ContentManager
                 'post_url' => $post_url
             ]
         ]));
-    }
-
-    public function allow_upload_mimes($mimes)
-    {
-        // Always allow these types when the plugin is active, not just frontend editor
-        // This ensures REST API uploads work too
-        $mimes['jpg|jpeg|jpe'] = 'image/jpeg';
-        $mimes['gif'] = 'image/gif';
-        $mimes['png'] = 'image/png';
-        $mimes['webp'] = 'image/webp';
-
-        self::log('allow_upload_mimes called', 'Frontend enabled: ' . ($this->isFrontendEditorEnabled ? 'YES' : 'NO'), 'Allowed mimes: ' . print_r($mimes, true));
-        return $mimes;
     }
 
     public function check_filetype_and_ext($data, $file, $filename, $mimes, $real_mime = null)

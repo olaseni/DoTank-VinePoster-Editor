@@ -3,20 +3,6 @@ import { createBlock } from '@wordpress/blocks';
 // Create initial template with locked/unlocked regions
 const createInitialTemplate = () => {
     return [
-        // EDITABLE: Description section
-        createBlock('core/group', {
-            className: 'editable-description',
-            lock: { move: true, remove: true },
-            templateLock: false,
-            allowedBlocks: ['core/paragraph', 'core/image']
-        }, [
-            createBlock('core/paragraph', {
-                content: '',
-                placeholder: 'Short Introduction',
-                fontSize: 'medium'
-            })
-        ]),
-
         // FIXED: Author section structure (locked, but content editable)
         createBlock('core/group', {
             className: 'template-author',
@@ -55,6 +41,20 @@ const createInitialTemplate = () => {
                 ])
             ])
         ]),
+
+        // EDITABLE: Description section
+        createBlock('core/group', {
+            className: 'editable-description',
+            lock: { move: true, remove: true },
+            templateLock: false,
+            allowedBlocks: ['core/paragraph', 'core/image']
+        }, [
+            createBlock('core/paragraph', {
+                content: '',
+                placeholder: 'Short Introduction',
+                fontSize: 'medium'
+            })
+        ]),        
 
         // EDITABLE: Main content area (completely flexible)
         createBlock('core/group', {
