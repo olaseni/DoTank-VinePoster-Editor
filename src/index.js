@@ -1,6 +1,8 @@
 import { createRoot } from '@wordpress/element';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import FrontendEditor from './FrontendEditor';
+
+
 import './style.scss';
 import './combined-block-styles.scss';
 

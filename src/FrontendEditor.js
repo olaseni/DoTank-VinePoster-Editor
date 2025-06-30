@@ -297,7 +297,7 @@ const FrontendEditor = () => {
             <div className="frontend-gutenberg-editor has-sidebar">
 
                 <div className="frontend-editor-content">
-                    <div className="frontend-editor-blocks">
+                    <div className="frontend-editor-blocks editor-styles-wrapper">
                         {/* Dedicated Title Input */}
                         <div className="post-title-section">
                             <textarea

@@ -7,7 +7,7 @@ const createInitialTemplate = () => {
         // FIXED: Author section structure (locked, but content editable)
         createBlock('core/group', {
             layout: { type: 'constrained' },
-            className: 'template-author',
+            className: 'template-author frontend-editor-section-group',
             lock: { move: true, remove: true },
             templateLock: 'insert'
         }, [
@@ -47,7 +47,7 @@ const createInitialTemplate = () => {
         // EDITABLE: Description section
         createBlock('core/group', {
             layout: { type: 'constrained' },
-            className: 'editable-description',
+            className: 'editable-description frontend-editor-section',
             lock: { move: true, remove: true },
             templateLock: false,
             allowedBlocks: ['core/paragraph', 'core/image'],
@@ -60,7 +60,7 @@ const createInitialTemplate = () => {
         // EDITABLE: Main content area (completely flexible)
         createBlock('core/group', {
             layout: { type: 'constrained' },
-            className: 'editable-main-content',
+            className: 'editable-main-content frontend-editor-section',
             lock: { move: true, remove: true },
             templateLock: false,
             allowedBlocks: allowedBlockTypesInMainContentArea
@@ -73,7 +73,7 @@ const createInitialTemplate = () => {
         // FIXED: Footer columns (structure locked, content editable)
         createBlock('core/group', {
             layout: { type: 'constrained' },
-            className: 'template-footer',
+            className: 'template-footer frontend-editor-section',
             lock: { move: true, remove: true },
             templateLock: 'insert'
         }, [

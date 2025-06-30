@@ -267,7 +267,7 @@ class ContentManager
             [],
             $asset['version']
         );
-
+        
         // Enqueue our custom styles
         wp_enqueue_style(
             'frontend-editor',
