@@ -20,6 +20,7 @@ import EditorSidebar from './components/EditorSidebar';
 import SelectionChangeWatcher from './components/SelectionChangeWatcher';
 import { mediaUploadUtilityWithNonce } from './utilities/mediaUploadUtility';
 import createInitialTemplate from './utilities/createInitialTemplate';
+import { allowedBlockTypesInEditor } from './constants/configuration';
 
 const FrontendEditor = () => {
     const [blocks, setBlocks] = useState([]);
@@ -323,16 +324,7 @@ const FrontendEditor = () => {
                                 canUserUseUnfilteredHTML: true,
                                 __experimentalCanUserUseUnfilteredHTML: true,
                                 mediaUpload: mediaUploadUtilityWithNonce(window?.frontendEditorData?.nonce),
-                                allowedBlockTypes: [
-                                    'core/video',
-                                    'core/image',
-                                    'core/columns',
-                                    'core/column',
-                                    'core/group',
-                                    'core/paragraph',
-                                    'core/button',
-                                    'core/buttons',
-                                ]
+                                allowedBlockTypes: allowedBlockTypesInEditor
                             }}
                         >
                             <BlockTools>
