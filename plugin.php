@@ -67,7 +67,7 @@ class ContentManager
         add_filter('wp_prevent_unsupported_mime_type_uploads', '__return_false');
     }
 
-    public function loadIsoGutenberg()
+    public function load_iso_gutenberg()
     {
         include plugin_dir_path(__FILE__) . 'includes/iso-gutenberg.php';
         $gutenberg = new IsoEditor_Gutenberg();
@@ -84,11 +84,17 @@ class ContentManager
         });
     }
 
+    public function restrict_blocks()
+    {
+        // Disable the "Written By" by-line
+        unregister_block_pattern('twentytwentyfive/hidden-written-by');
+    }
+
     public function init()
     {
         $this->disable_admin_bar_on_request();
-        $this->loadIsoGutenberg();
-        unregister_block_pattern('twentytwentyfive/hidden-written-by');
+        $this->load_iso_gutenberg();
+        $this->restrict_blocks();
 
         register_post_type('managed_content', [
             'labels' => [
@@ -259,7 +265,7 @@ class ContentManager
 
         // Enqueue media scripts for the media modal
         wp_enqueue_media();
-        
+
         wp_enqueue_script(
             'frontend-editor',
             plugin_dir_url(__FILE__) . 'build/index.js',

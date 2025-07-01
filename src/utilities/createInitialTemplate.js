@@ -74,17 +74,17 @@ const createInitialTemplate = () => {
         createBlock('core/group', {
             layout: { type: 'constrained' },
             className: 'template-footer frontend-editor-section',
-            lock: { move: true, remove: true },
+            lock: { move: false, remove: false },
             templateLock: 'insert'
         }, [
             createBlock('core/columns', {
                 columns: 1,
-                lock: { move: true, remove: true },
+                lock: { move: false, remove: false },
                 allowedBlocks: ['core/column']
             }, [
                 createBlock('core/column', {
                     lock: { move: false, remove: false },
-                    allowedBlocks: ['core/paragraph', 'core/button'],
+                    allowedBlocks: ['core/paragraph', 'core/button', 'core/buttons'],
                 }, [
                     createBlock('core/paragraph', {
                         content: '',

@@ -1,12 +1,26 @@
 import { createRoot } from '@wordpress/element';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import FrontendEditor from './FrontendEditor';
-
+import { unregisterFormatType } from '@wordpress/rich-text';
 
 import './style-editor.scss';
 
 // Register all core blocks
 registerCoreBlocks();
+
+const formatsToRemove = [
+    'core/strikethrough',
+    'core/code',
+    'core/image',
+    'core/keyboard',
+    'core/subscript',
+    'core/superscript',
+    'core/language',
+    'core/underline',
+    'core/text-color',
+];
+
+formatsToRemove.forEach(format => unregisterFormatType(format));
 
 const editorRoot = document.getElementById('frontend-editor-root');
 
