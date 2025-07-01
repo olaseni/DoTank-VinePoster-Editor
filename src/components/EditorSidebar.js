@@ -1,7 +1,13 @@
 import { Button, Panel, PanelBody, PanelRow } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
+import FeaturedImage from './FeaturedImage';
+import Tags from './Tags';
 
 const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId, currentSelectedBlock, blocks }) => {
+    
+    // Feature flags
+    const SHOW_FEATURED_IMAGE = false;
+    const SHOW_TAGS = false;
     
     // Helper function to find a block by clientId in the blocks tree
     const findBlockByClientId = (clientId, blocksArray) => {
@@ -196,52 +202,17 @@ const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId, currentSelectedB
                     </div>
                 </PanelBody>
 
-                <PanelBody title="Featured Image" initialOpen={false}>
-                    <div className="featured-image-container">
-                        <div className="featured-image-placeholder">
-                            <div className="image-placeholder-icon">
-                                <svg viewBox="0 0 24 24" width="24" height="24">
-                                    <path d="M19 7v10H5V7h14m0-2H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-5 6l-3 3.72L9 13l-3 4h12l-4-5z"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <Button 
-                            variant="secondary" 
-                            className="featured-image-button"
-                            isSmall
-                        >
-                            Set Featured Image
-                        </Button>
-                    </div>
-                </PanelBody>
+                {SHOW_FEATURED_IMAGE && (
+                    <PanelBody title="Featured Image" initialOpen={false}>
+                        <FeaturedImage />
+                    </PanelBody>
+                )}
 
-                <PanelBody title="Tags" initialOpen={false}>
-                    <div className="tags-container">
-                        <div className="tag-buttons">
-                            <Button 
-                                variant="secondary" 
-                                className="tag-button"
-                                isSmall
-                            >
-                                TAG 1
-                            </Button>
-                            <Button 
-                                variant="secondary" 
-                                className="tag-button"
-                                isSmall
-                            >
-                                TAG 2
-                            </Button>
-                        </div>
-                        <Button 
-                            variant="link" 
-                            className="add-tag-button"
-                            isSmall
-                        >
-                            + Add Tag
-                        </Button>
-                    </div>
-                </PanelBody>
+                {SHOW_TAGS && (
+                    <PanelBody title="Tags" initialOpen={false}>
+                        <Tags />
+                    </PanelBody>
+                )}
             </Panel>
         </div>
     );
