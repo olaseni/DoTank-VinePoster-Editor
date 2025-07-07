@@ -1,4 +1,4 @@
-import { Button, Panel, PanelBody, PanelRow } from '@wordpress/components';
+import { Button, Panel, PanelBody } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import FeaturedImage from './FeaturedImage';
 import Tags from './Tags';

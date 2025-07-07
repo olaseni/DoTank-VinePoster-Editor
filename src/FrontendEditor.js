@@ -6,10 +6,8 @@ import {
     BlockList,
     BlockTools,
     WritingFlow,
-    ObserveTyping,
-    store as blockEditorStore
+    ObserveTyping
 } from '@wordpress/block-editor';
-import { select, dispatch, useSelect } from '@wordpress/data';
 import {
     Button,
     SlotFillProvider,
