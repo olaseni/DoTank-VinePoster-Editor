@@ -16,6 +16,7 @@ import {
 } from '@wordpress/components';
 import EditorSidebar from './components/EditorSidebar';
 import SelectionChangeWatcher from './components/SelectionChangeWatcher';
+import PreviewModal from './components/PreviewModal';
 import { mediaUploadUtilityWithNonce } from './utilities/mediaUploadUtility';
 import createInitialTemplate from './utilities/createInitialTemplate';
 import { allowedBlockTypesInEditor } from './constants/configuration';
@@ -390,34 +391,12 @@ const FrontendEditor = () => {
                 </div>
 
                 {/* Post Preview Modal */}
-                {showPostPreview && publishedPostUrl && (
-                    <div
-                        className="post-preview-modal-overlay"
-                        onClick={(e) => {
-                            if (e.target === e.currentTarget) {
-                                setShowPostPreview(false);
-                            }
-                        }}
-                    >
-                        <div className="post-preview-modal">
-                            <div className="post-preview-content">
-                                <iframe
-                                    src={publishedPostUrl}
-                                    frameBorder="0"
-                                    title="Published Post Preview"
-                                />
-                            </div>
-                            <div className="post-preview-footer">
-                                <Button
-                                    variant="secondary"
-                                    onClick={() => setShowPostPreview(false)}
-                                >
-                                    Close
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                <PreviewModal
+                    isVisible={showPostPreview}
+                    onClose={() => setShowPostPreview(false)}
+                    previewUrl={publishedPostUrl}
+                    title="Published Post Preview"
+                />
             </div>
         </SlotFillProvider>
     );
