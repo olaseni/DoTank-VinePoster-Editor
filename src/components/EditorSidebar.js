@@ -2,6 +2,7 @@ import { Button, Panel, PanelBody } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import FeaturedImage from './FeaturedImage';
 import Tags from './Tags';
+import BlockInserterButton from './BlockInserterButton';
 
 const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId, currentSelectedBlock, blocks }) => {
     
@@ -132,65 +133,79 @@ const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId, currentSelectedB
             <Panel>
                 <PanelBody title="Columns" initialOpen={true}>
                     <div className="columns-grid">
-                        <div 
-                            className={`column-option ${!isBlockTypeAllowed('core/columns') ? 'disabled' : ''}`}
-                            title={isBlockTypeAllowed('core/columns') ? "Single Column" : "Not allowed in this context"}
-                            onClick={() => isBlockTypeAllowed('core/columns') && handleInsertBlock('core/columns', { columns: 1 })}
+                        <BlockInserterButton
+                            blockType="core/columns"
+                            attributes={{ columns: 1 }}
+                            isAllowed={isBlockTypeAllowed('core/columns')}
+                            onInsert={handleInsertBlock}
+                            title="Single Column"
+                            className="column-option"
                         >
                             <div className="column-preview single-column">
                                 <div className="column-bar"></div>
                             </div>
-                        </div>
-                        <div 
-                            className={`column-option ${!isBlockTypeAllowed('core/columns') ? 'disabled' : ''}`}
-                            title={isBlockTypeAllowed('core/columns') ? "Two Columns" : "Not allowed in this context"}
-                            onClick={() => isBlockTypeAllowed('core/columns') && handleInsertBlock('core/columns', { columns: 2 })}
+                        </BlockInserterButton>
+                        <BlockInserterButton
+                            blockType="core/columns"
+                            attributes={{ columns: 2 }}
+                            isAllowed={isBlockTypeAllowed('core/columns')}
+                            onInsert={handleInsertBlock}
+                            title="Two Columns"
+                            className="column-option"
                         >
                             <div className="column-preview double-column">
                                 <div className="column-bar"></div>
                                 <div className="column-bar"></div>
                             </div>
-                        </div>
+                        </BlockInserterButton>
                     </div>
                 </PanelBody>
 
                 <PanelBody title="Blocks" initialOpen={true}>
                     <div className="blocks-grid">
-                        <div 
-                            className={`block-option ${!isBlockTypeAllowed('core/paragraph') ? 'disabled' : ''}`}
-                            title={isBlockTypeAllowed('core/paragraph') ? "Text Block" : "Not allowed in this context"}
-                            onClick={() => isBlockTypeAllowed('core/paragraph') && handleInsertBlock('core/paragraph', { placeholder: 'Start writing...' })}
+                        <BlockInserterButton
+                            blockType="core/paragraph"
+                            attributes={{ placeholder: 'Start writing...' }}
+                            isAllowed={isBlockTypeAllowed('core/paragraph')}
+                            onInsert={handleInsertBlock}
+                            title="Text Block"
                         >
                             <div className="block-icon text-icon">
                                 <span>A</span>
                             </div>
-                        </div>
-                        <div 
-                            className={`block-option ${!isBlockTypeAllowed('core/image') ? 'disabled' : ''}`}
-                            title={isBlockTypeAllowed('core/image') ? "Image Block" : "Not allowed in this context"}
-                            onClick={() => isBlockTypeAllowed('core/image') && handleInsertBlock('core/image', { caption: '' })}
+                        </BlockInserterButton>
+                        <BlockInserterButton
+                            blockType="core/image"
+                            attributes={{ caption: '' }}
+                            isAllowed={isBlockTypeAllowed('core/image')}
+                            onInsert={handleInsertBlock}
+                            title="Image Block"
                         >
                             <div className="block-icon image-icon">
                                 <svg viewBox="0 0 24 24" width="16" height="16">
                                     <path d="M19 7v10H5V7h14m0-2H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-5 6l-3 3.72L9 13l-3 4h12l-4-5z"/>
                                 </svg>
                             </div>
-                        </div>
-                        <div 
-                            className={`block-option ${!isBlockTypeAllowed('core/video') ? 'disabled' : ''}`}
-                            title={isBlockTypeAllowed('core/video') ? "Media Block" : "Not allowed in this context"}
-                            onClick={() => isBlockTypeAllowed('core/video') && handleInsertBlock('core/video', {})}
+                        </BlockInserterButton>
+                        <BlockInserterButton
+                            blockType="core/video"
+                            attributes={{}}
+                            isAllowed={isBlockTypeAllowed('core/video')}
+                            onInsert={handleInsertBlock}
+                            title="Media Block"
                         >
                             <div className="block-icon media-icon">
                                 <svg viewBox="0 0 24 24" width="16" height="16">
                                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
                                 </svg>
                             </div>
-                        </div>
-                        <div 
-                            className={`block-option ${!isBlockTypeAllowed('core/button') ? 'disabled' : ''}`}
-                            title={isBlockTypeAllowed('core/button') ? "Button Block" : "Not allowed in this context"}
-                            onClick={() => isBlockTypeAllowed('core/button') && handleInsertBlock('core/button', { text: 'Click me', url: '' })}
+                        </BlockInserterButton>
+                        <BlockInserterButton
+                            blockType="core/button"
+                            attributes={{ text: 'Click me', url: '' }}
+                            isAllowed={isBlockTypeAllowed('core/button')}
+                            onInsert={handleInsertBlock}
+                            title="Button Block"
                         >
                             <div className="block-icon button-icon">
                                 <span>Button</span>
@@ -198,7 +213,7 @@ const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId, currentSelectedB
                                     <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
                                 </svg>
                             </div>
-                        </div>
+                        </BlockInserterButton>
                     </div>
                 </PanelBody>
 
