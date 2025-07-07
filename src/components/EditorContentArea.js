@@ -118,7 +118,7 @@ const EditorContentArea = ({
     };
 
     return (
-        <div className="frontend-editor-blocks editor-styles-wrapper">
+        <div className="frontend-editor-blocks editor-styles-wrapper is-editor-constrained">
             <BlockEditorProvider
                 value={blocks}
                 onInput={onBlocksChange}

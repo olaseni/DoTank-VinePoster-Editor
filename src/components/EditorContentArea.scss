@@ -1,4 +1,11 @@
 .frontend-editor-blocks {
     // This will contain the block editor styling
     // The editor-styles-wrapper class is already handled by WordPress
+
+    // Add custom class to constrain the editor to the center
+    &.is-editor-constrained> :where(:not(.alignleft):not(.alignright):not(.alignfull)) {
+        max-width: var(--wp--style--global--content-size);
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
 }
