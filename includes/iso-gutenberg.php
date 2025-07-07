@@ -5,14 +5,6 @@
  */
 class IsoEditor_Gutenberg {
 	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		add_action( 'template_redirect', [ $this, 'setup_media' ] );
-		add_filter( 'block_editor_settings', [ $this, 'block_editor_settings' ] );
-	}
-
-	/**
 	 * Load Gutenberg
 	 *
 	 * Based on wp-admin/edit-form-blocks.php
@@ -78,22 +70,6 @@ class IsoEditor_Gutenberg {
 		if ( $current_screen ) {
 			$current_screen->is_block_editor( true );
 		}
-	}
-
-	/**
-	 * Override some features that probably don't make sense in an isolated editor
-	 *
-	 * @param array $settings Settings array.
-	 * @return array
-	 */
-	public function block_editor_settings( array $settings ) {
-		$settings['availableLegacyWidgets'] = (object) [];
-		$settings['hasPermissionsToManageWidgets'] = false;
-
-		// Start with no patterns
-		$settings['__experimentalBlockPatterns'] = [];
-
-		return $settings;
 	}
 
 	/**
@@ -256,19 +232,5 @@ class IsoEditor_Gutenberg {
 				'after'
 			);
 		}
-	}
-
-	/**
-	 * Ensure media works in Gutenberg
-	 *
-	 * @return void
-	 */
-	public function setup_media() {
-		/**
-		 * @psalm-suppress MissingFile
-		 */
-		require_once ABSPATH . 'wp-admin/includes/media.php';
-
-		wp_enqueue_media();
 	}
 }

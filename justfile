@@ -52,6 +52,13 @@ logs:
         tail -f logs/*
     fi
 
+wp-logs:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    LOG=$(realpath ~/.wp-now/wp-content/$(basename "${PWD}")-*/debug.log)
+    test -f "${LOG}" || exit 1
+    tail -f "${LOG}"
+
 clear-logs:
     @rm -f ./logs/* > /dev/null 2>&1
 

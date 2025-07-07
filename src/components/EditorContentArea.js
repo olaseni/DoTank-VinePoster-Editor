@@ -124,11 +124,22 @@ const EditorContentArea = ({
                 onInput={onBlocksChange}
                 onChange={onBlocksChange}
                 settings={{
+                    alignWide: false,
+                    disableCustomColors: true,
+                    disableCustomFontSizes: true,
+                    disablePostFormats: true,
                     hasFixedToolbar: false,
+                    availableLegacyWidgets: {},
+                    hasPermissionsToManageWidgets: false,
                     focusMode: false,
                     hasReducedUI: false,
                     canUserUseUnfilteredHTML: true,
-                    __experimentalCanUserUseUnfilteredHTML: true,
+                    canLockBlocks: false,
+                    codeEditingEnabled: false,
+                    richEditingEnabled: false,
+                    __experimentalCanUserUseUnfilteredHTML: false,
+                    __experimentalBlockPatterns: [],
+                    __experimentalBlockPatternCategories: [],
                     mediaUpload: mediaUploadUtilityWithNonce(window?.frontendEditorData?.nonce),
                     allowedBlockTypes: allowedBlockTypesInEditor
                 }}
