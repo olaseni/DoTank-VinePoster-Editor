@@ -2,26 +2,16 @@ import '@wordpress/editor';
 import { StrictMode, useState, useEffect } from '@wordpress/element';
 import { parse, serialize } from '@wordpress/blocks';
 import {
-    BlockEditorProvider,
-    BlockList,
-    BlockTools,
-    WritingFlow,
-    ObserveTyping
-} from '@wordpress/block-editor';
-import {
     Button,
     SlotFillProvider,
     Popover,
     Snackbar
 } from '@wordpress/components';
-import EditorSidebar from './components/EditorSidebar';
-import SelectionChangeWatcher from './components/SelectionChangeWatcher';
 import PreviewModal from './components/PreviewModal';
 import EditorFooter from './components/EditorFooter';
 import PostTitle from './components/PostTitle';
-import { mediaUploadUtilityWithNonce } from './utilities/mediaUploadUtility';
+import EditorContentArea from './components/EditorContentArea';
 import createInitialTemplate from './utilities/createInitialTemplate';
-import { allowedBlockTypesInEditor } from './constants/configuration';
 
 const FrontendEditor = () => {
     const [blocks, setBlocks] = useState([]);
@@ -34,9 +24,6 @@ const FrontendEditor = () => {
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const [initialContent, setInitialContent] = useState({ blocks: [], title: '' });
     const [postStatus, setPostStatus] = useState('draft');
-
-    // Track current selected block index
-    const [currentSelectedBlock, setCurrentSelectedBlock] = useState(-1);
 
     // Notice management
     const addNotice = (message, type = 'success', actions = []) => {
@@ -201,150 +188,25 @@ const FrontendEditor = () => {
         }
     };
 
-    // Function to insert a new block at the current position (column/group containers only)
-    const handleInsertBlock = (newBlock) => {
-        const currentSelectedBlockClientId = currentSelectedBlock?.clientId;
-
-        if (currentSelectedBlockClientId) {
-            // Only allow insertion in column and group containers
-            const allowedContainerTypes = ['core/column', 'core/group'];
-            const containerOfContainerTypes = ['core/columns'];
-
-            // Search for the selected block and handle insertion
-            const findAndInsertInContainer = (blocksArray) => {
-                for (let i = 0; i < blocksArray.length; i++) {
-                    const block = blocksArray[i];
-
-                    // Check if the selected block IS this container of containers (e.g., columns)
-                    if (block.clientId === currentSelectedBlockClientId &&
-                        containerOfContainerTypes.includes(block.name) &&
-                        block.innerBlocks && block.innerBlocks.length > 0) {
-
-                        // Find the first sub-container (e.g., first column)
-                        const firstSubContainer = block.innerBlocks[0];
-                        if (firstSubContainer && allowedContainerTypes.includes(firstSubContainer.name)) {
-                            // Insert at the end of the first sub-container
-                            const updatedFirstSubContainer = {
-                                ...firstSubContainer,
-                                innerBlocks: [...firstSubContainer.innerBlocks, newBlock]
-                            };
-
-                            const updatedInnerBlocks = [...block.innerBlocks];
-                            updatedInnerBlocks[0] = updatedFirstSubContainer;
-
-                            const updatedBlock = {
-                                ...block,
-                                innerBlocks: updatedInnerBlocks
-                            };
-
-                            const updatedBlocks = [...blocksArray];
-                            updatedBlocks[i] = updatedBlock;
-
-                            return updatedBlocks;
-                        }
-                    }
-
-                    // Check if selected block is in this container's inner blocks
-                    if (block.innerBlocks && block.innerBlocks.length > 0 &&
-                        allowedContainerTypes.includes(block.name)) {
-                        const innerBlockIndex = block.innerBlocks.findIndex(
-                            innerBlock => innerBlock.clientId === currentSelectedBlockClientId
-                        );
-
-                        if (innerBlockIndex !== -1) {
-                            // Found the selected block in this container, insert after it
-                            const updatedInnerBlocks = [...block.innerBlocks];
-                            updatedInnerBlocks.splice(innerBlockIndex + 1, 0, newBlock);
-
-                            // Update the parent block with new inner blocks
-                            const updatedBlock = {
-                                ...block,
-                                innerBlocks: updatedInnerBlocks
-                            };
-
-                            // Update the main blocks array
-                            const updatedBlocks = [...blocksArray];
-                            updatedBlocks[i] = updatedBlock;
-
-                            return updatedBlocks;
-                        }
-                    }
-
-                    // Recursively search deeper nested blocks
-                    if (block.innerBlocks && block.innerBlocks.length > 0) {
-                        const nestedResult = findAndInsertInContainer(block.innerBlocks);
-                        if (nestedResult) {
-                            const updatedBlock = {
-                                ...block,
-                                innerBlocks: nestedResult
-                            };
-                            const updatedBlocks = [...blocksArray];
-                            updatedBlocks[i] = updatedBlock;
-                            return updatedBlocks;
-                        }
-                    }
-                }
-                return null;
-            };
-
-            const updatedBlocks = findAndInsertInContainer(blocks);
-            if (updatedBlocks) {
-                setBlocks(updatedBlocks);
-                console.log(`Inserted ${newBlock.name} successfully`);
-            } else {
-                console.log(`No valid container found for selected block - block insertion skipped`);
-            }
-        } else {
-            console.log(`No block selected - block insertion skipped`);
-        }
-    };
 
     return (
         <SlotFillProvider>
             <div className="frontend-gutenberg-editor has-sidebar">
 
                 <div className="frontend-editor-content">
-                    <div className="frontend-editor-blocks editor-styles-wrapper">
-                        {/* Dedicated Title Input */}
-                        <PostTitle
-                            title={postTitle}
-                            onChange={(e) => setPostTitle(e.target.value)}
-                            placeholder="Title"
-                        />
+                    {/* Dedicated Title Input */}
+                    <PostTitle
+                        title={postTitle}
+                        onChange={(e) => setPostTitle(e.target.value)}
+                        placeholder="Title"
+                    />
 
-                        <BlockEditorProvider
-                            value={blocks}
-                            onInput={setBlocks}
-                            onChange={setBlocks}
-                            settings={{
-                                hasFixedToolbar: false,
-                                focusMode: false,
-                                hasReducedUI: false,
-                                canUserUseUnfilteredHTML: true,
-                                __experimentalCanUserUseUnfilteredHTML: true,
-                                mediaUpload: mediaUploadUtilityWithNonce(window?.frontendEditorData?.nonce),
-                                allowedBlockTypes: allowedBlockTypesInEditor
-                            }}
-                        >
-                            <BlockTools>
-                                <WritingFlow>
-                                    <ObserveTyping>
-                                        <BlockList />
-                                    </ObserveTyping>
-                                </WritingFlow>
-                            </BlockTools>
-                            <SelectionChangeWatcher
-                                onSelectionChange={setCurrentSelectedBlock}
-                            />
-                            <EditorSidebar
-                                onInsertBlock={handleInsertBlock}
-                                onPreviewClick={handlePreviewClick}
-                                postId={postId}
-                                currentSelectedBlock={currentSelectedBlock}
-                                blocks={blocks}
-                            />
-                        </BlockEditorProvider>
-                    </div>
+                    <EditorContentArea
+                        blocks={blocks}
+                        onBlocksChange={setBlocks}
+                        onPreviewClick={handlePreviewClick}
+                        postId={postId}
+                    />
                 </div>
 
                 <EditorFooter
