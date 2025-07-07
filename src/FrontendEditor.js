@@ -17,6 +17,7 @@ import {
 import EditorSidebar from './components/EditorSidebar';
 import SelectionChangeWatcher from './components/SelectionChangeWatcher';
 import PreviewModal from './components/PreviewModal';
+import EditorFooter from './components/EditorFooter';
 import { mediaUploadUtilityWithNonce } from './utilities/mediaUploadUtility';
 import createInitialTemplate from './utilities/createInitialTemplate';
 import { allowedBlockTypesInEditor } from './constants/configuration';
@@ -353,26 +354,12 @@ const FrontendEditor = () => {
                     </div>
                 </div>
 
-                <div className="frontend-editor-footer">
-                    <Button
-                        variant="secondary"
-                        onClick={() => savePost('draft')}
-                        isBusy={isSaving}
-                        disabled={isSaving || !hasUnsavedChanges}
-                        className="save-draft-btn"
-                    >
-                        Save Draft
-                    </Button>
-                    <Button
-                        variant="primary"
-                        onClick={() => savePost('publish')}
-                        isBusy={isSaving}
-                        disabled={isSaving || !hasUnsavedChanges}
-                        className="publish-btn"
-                    >
-                        Publish
-                    </Button>
-                </div>
+                <EditorFooter
+                    onSaveDraft={() => savePost('draft')}
+                    onPublish={() => savePost('publish')}
+                    isSaving={isSaving}
+                    hasUnsavedChanges={hasUnsavedChanges}
+                />
 
                 <Popover.Slot />
 

@@ -1,6 +1,7 @@
 /* Gutenberg Native Editor Styles */
 @use './components/EditorSidebar.scss';
 @use './components/PreviewModal.scss';
+@use './components/EditorFooter.scss';
 
 .editor-styles-wrapper {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
@@ -77,54 +78,6 @@
 }
 
 
-.frontend-editor-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    gap: 12px;
-    padding: 16px 24px;
-    justify-content: flex-start;
-    background: transparent;
-    z-index: 100;
-    
-    .save-draft-btn {
-        background: white;
-        color: #0073aa;
-        border: 1px solid #0073aa;
-        padding: 12px 24px;
-        border-radius: 4px;
-        font-weight: 500;
-        
-        &:hover:not(:disabled) {
-            background: #f0f6fc;
-        }
-        
-        &:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-    }
-    
-    .publish-btn {
-        background: #0073aa;
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 4px;
-        font-weight: 500;
-        
-        &:hover:not(:disabled) {
-            background: #005a87;
-        }
-        
-        &:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-    }
-}
 
 /* Editor Notices */
 .editor-notices {
