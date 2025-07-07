@@ -49,7 +49,7 @@ class ContentManager
 
         add_action('init', [$this, 'init']);
         add_action('show_admin_bar', fn() => !$this->isFrontendEditorEnabled);
-        add_action('template_redirect', [$this, 'frontend_editor_redirect']);
+        add_action('template_include', [$this, 'load_editor']);
 
         if ($this->isFrontendSampleEnabled) {
             return;
@@ -57,9 +57,7 @@ class ContentManager
 
         add_action('rest_api_init', [$this, 'register_rest_routes']);
         add_action('save_post_managed_content', [$this, 'calculate_read_time'], 10, 3);
-        add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_editor_assets']);
-        add_action('wp_enqueue_scripts', [$this, 'enqueue_global_assets']);
-        add_action('wp_print_scripts', [$this, 'debug_enqueued_scripts']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('wp_ajax_nopriv_save_post_content', [$this, 'ajax_save_post_content']);
         add_action('wp_ajax_save_post_content', [$this, 'ajax_save_post_content']);
         add_action('wp_ajax_nopriv_publish_post_content', [$this, 'ajax_publish_post_content']);
@@ -219,29 +217,32 @@ class ContentManager
         self::log($post_id, $content, $word_count, $read_time);
     }
 
-    public function frontend_editor_redirect()
+    public function load_editor($template)
     {
         if ($this->isFrontendEditorEnabled) {
             // Temporarily grant admin capabilities for frontend editor
             add_filter('user_has_cap', [$this, 'grant_temporary_caps'], 10, 3);
-            include plugin_dir_path(__FILE__) . 'includes/frontend-editor.php';
-
-            return;
+            return plugin_dir_path(__FILE__) . 'includes/frontend-editor.php';
         }
 
         if (($_GET['frontend-sample'] ?? '') === '1') {
-            include plugin_dir_path(__FILE__) . 'includes/frontend-sample.php';
+            return plugin_dir_path(__FILE__) . 'includes/frontend-sample.php';
+        }
+        return $template;
+    }
 
+    public function enqueue_assets()
+    {
+        if ($this->isFrontendEditorEnabled) {
+            $this->enqueue_frontend_editor_assets();
             return;
         }
+
+        $this->enqueue_global_assets();
     }
 
     public function enqueue_global_assets()
     {
-        if ($this->isFrontendEditorEnabled) {
-            return;
-        }
-
         wp_enqueue_style(
             'frontend-editor-index',
             plugin_dir_url(__FILE__) . 'build/index.css'
@@ -255,16 +256,9 @@ class ContentManager
 
     public function enqueue_frontend_editor_assets()
     {
-        if (! $this->isFrontendEditorEnabled) {
-            self::log('Frontend editor NOT detected');
-            return;
-        }
-
         // Use the auto-generated asset file for dependencies
         $asset_file = plugin_dir_path(__FILE__) . 'build/index.asset.php';
         $asset = file_exists($asset_file) ? include $asset_file : ['dependencies' => [], 'version' => '1.0.0'];
-
-        self::log('Asset data: ' . print_r($asset, true));
 
         // Enqueue media scripts for the media modal
         wp_enqueue_media();
@@ -316,30 +310,6 @@ class ContentManager
                 'unfiltered_html' => true
             ]
         ]);
-
-        self::log(__METHOD__ . ' completed');
-    }
-
-    public function debug_enqueued_scripts()
-    {
-        if (!$this->isFrontendEditorEnabled) {
-            return;
-        }
-        $assets = [
-            'frontend-editor',
-            'wp-editor',
-            'wp-edit-post'
-        ];
-        foreach ($assets as $asset) {
-            $details = [' ... ENQUEUE-DEBUG::[' . $asset . ']'];
-            if (wp_script_is($asset, 'registered')) {
-                $details[] = 'Registered';
-            }
-            if (wp_script_is($asset, 'enqueued')) {
-                $details[] = 'Enqueued';
-            }
-            self::log(implode(' ', $details));
-        }
     }
 
     public function ajax_save_post_content()
