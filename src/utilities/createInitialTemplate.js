@@ -9,7 +9,7 @@ const createInitialTemplate = () => {
             layout: { type: 'constrained' },
             className: 'template-author frontend-editor-section-group',
             lock: { move: true, remove: true },
-            templateLock: 'insert'
+            templateLock: 'contentOnly'
         }, [
             createBlock('core/columns', {
                 columns: 2,
