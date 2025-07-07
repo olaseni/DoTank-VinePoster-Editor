@@ -1,5 +1,6 @@
 import { Button, Panel, PanelBody } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
+import { useSelect, useDispatch } from '@wordpress/data';
 import FeaturedImage from './FeaturedImage';
 import Tags from './Tags';
 import BlockInserterButton from './BlockInserterButton';
@@ -9,6 +10,25 @@ const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId, currentSelectedB
     // Feature flags
     const SHOW_FEATURED_IMAGE = false;
     const SHOW_TAGS = false;
+    
+    // Get native WordPress block editor data and actions
+    const {
+        insertionPoint,
+        selectedBlockClientId,
+        availableInserterItems,
+        canInsertBlockType
+    } = useSelect((select) => {
+        const blockEditorSelect = select('core/block-editor');
+        
+        return {
+            insertionPoint: blockEditorSelect?.getBlockInsertionPoint?.() || null,
+            selectedBlockClientId: blockEditorSelect?.getSelectedBlockClientId?.() || null,
+            availableInserterItems: blockEditorSelect?.getInserterItems?.() || [],
+            canInsertBlockType: blockEditorSelect?.canInsertBlockType || null
+        };
+    }, []);
+    
+    const { insertBlock, insertBlocks } = useDispatch('core/block-editor');
     
     // Helper function to find a block by clientId in the blocks tree
     const findBlockByClientId = (clientId, blocksArray) => {
@@ -38,56 +58,63 @@ const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId, currentSelectedB
         return null;
     };
 
-    // Check if a block type is allowed in the current context
+    // Check if a block type is allowed using native WordPress APIs only
     const isBlockTypeAllowed = (blockType) => {
-        if (!currentSelectedBlock?.clientId) return false;
-
-        // Find the parent container
-        const parentContainer = findParentContainer(currentSelectedBlock.clientId, blocks);
+        // Use native WordPress canInsertBlockType if available
+        if (canInsertBlockType) {
+            try {
+                return canInsertBlockType(blockType);
+            } catch (error) {
+                console.log('Native canInsertBlockType failed:', error.message);
+                return false;
+            }
+        }
         
-        if (!parentContainer) return false;
-
-        // Check if parent container is locked
-        if (parentContainer.attributes?.templateLock === 'all' || 
-            parentContainer.attributes?.templateLock === 'insert') {
-            return false;
+        // Check if block type is in available inserter items (native Gutenberg logic)
+        if (availableInserterItems.length > 0) {
+            return availableInserterItems.some(item => item.name === blockType);
         }
-
-        // Check allowedBlocks
-        const allowedBlocks = parentContainer.attributes?.allowedBlocks;
-        if (allowedBlocks && Array.isArray(allowedBlocks)) {
-            return allowedBlocks.includes(blockType);
-        }
-
-        // If no allowedBlocks restriction, allow insertion in editable containers
-        const editableContainers = ['core/group', 'core/column'];
-        return editableContainers.includes(parentContainer.name);
+        
+        // No native APIs available
+        return false;
     };
 
     const handleInsertBlock = (blockType, attributes = {}) => {
-        let newBlock;
+        console.log(`🚀 Inserting block: ${blockType}`, { attributes, insertionPoint, selectedBlockClientId });
         
-        // Handle columns block creation with inner column blocks
-        if (blockType === 'core/columns') {
-            const columnCount = attributes.columns || 2;
-            const innerBlocks = [];
-            
-            // Create the specified number of column blocks
-            for (let i = 0; i < columnCount; i++) {
-                innerBlocks.push(createBlock('core/column', {}, [
-                    createBlock('core/paragraph', { 
-                        placeholder: 'Add content...'
-                    })
-                ]));
-            }
-            
-            newBlock = createBlock(blockType, attributes, innerBlocks);
-        } else {
-            newBlock = createBlock(blockType, attributes);
+        // Use native WordPress insertion only
+        if (!insertBlock || !insertionPoint) {
+            console.log('❌ Native WordPress insertion not available');
+            return;
         }
         
-        if (onInsertBlock) {
-            onInsertBlock(newBlock);
+        try {
+            let newBlock;
+            
+            // Handle columns block creation with inner column blocks
+            if (blockType === 'core/columns') {
+                const columnCount = attributes.columns || 2;
+                const innerBlocks = [];
+                
+                // Create the specified number of column blocks
+                for (let i = 0; i < columnCount; i++) {
+                    innerBlocks.push(createBlock('core/column', {}, [
+                        createBlock('core/paragraph', { 
+                            placeholder: 'Add content...'
+                        })
+                    ]));
+                }
+                
+                newBlock = createBlock(blockType, attributes, innerBlocks);
+            } else {
+                newBlock = createBlock(blockType, attributes);
+            }
+            
+            // Use native WordPress insertion with proper insertion point
+            insertBlock(newBlock, insertionPoint.index, insertionPoint.rootClientId);
+            console.log(`✅ Successfully inserted ${blockType} using native WordPress API`);
+        } catch (error) {
+            console.log(`❌ Native insertion failed for ${blockType}:`, error.message);
         }
     };
     return (
