@@ -18,8 +18,8 @@ const createInitialTemplate = () => {
                 verticalAlignment: 'center'
             }, [
                 createBlock('core/column', {
-                    lock: { move: true, remove: true },
-                    allowedBlocks: ['core/image'],
+                    lock: { move: false, remove: false },
+                    allowedBlocks: [],
                     width: 'fit-content',
                     className: 'author-avatar-column'
                 }, [
@@ -32,8 +32,8 @@ const createInitialTemplate = () => {
                     })
                 ]),
                 createBlock('core/column', {
-                    lock: { move: true, remove: true },
-                    allowedBlocks: ['core/paragraph'],
+                    lock: { move: false, remove: false },
+                    allowedBlocks: [],
                     verticalAlignment: 'center'
                 }, [
                     createBlock('core/paragraph', {
