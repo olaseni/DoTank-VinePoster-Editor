@@ -18,6 +18,7 @@ import EditorSidebar from './components/EditorSidebar';
 import SelectionChangeWatcher from './components/SelectionChangeWatcher';
 import PreviewModal from './components/PreviewModal';
 import EditorFooter from './components/EditorFooter';
+import PostTitle from './components/PostTitle';
 import { mediaUploadUtilityWithNonce } from './utilities/mediaUploadUtility';
 import createInitialTemplate from './utilities/createInitialTemplate';
 import { allowedBlockTypesInEditor } from './constants/configuration';
@@ -305,19 +306,11 @@ const FrontendEditor = () => {
                 <div className="frontend-editor-content">
                     <div className="frontend-editor-blocks editor-styles-wrapper">
                         {/* Dedicated Title Input */}
-                        <div className="post-title-section">
-                            <textarea
-                                className="post-title-input"
-                                placeholder="Title"
-                                value={postTitle}
-                                onChange={(e) => setPostTitle(e.target.value)}
-                                rows={1}
-                                onInput={(e) => {
-                                    e.target.style.height = 'auto';
-                                    e.target.style.height = e.target.scrollHeight + 'px';
-                                }}
-                            />
-                        </div>
+                        <PostTitle
+                            title={postTitle}
+                            onChange={(e) => setPostTitle(e.target.value)}
+                            placeholder="Title"
+                        />
 
                         <BlockEditorProvider
                             value={blocks}

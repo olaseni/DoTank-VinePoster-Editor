@@ -1,0 +1,36 @@
+.post-title-section {
+    margin: 2em;
+    
+    .post-title-input {
+        width: 100%;
+        border: none;
+        outline: none;
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1.4;
+        color: #1e1e1e;
+        background: transparent;
+        font-family: inherit;
+        padding: 0;
+        resize: none;
+        box-shadow: none;
+        -webkit-appearance: none;
+        min-height: 3.5rem;
+        overflow: hidden;
+        max-width: 645px;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        display: block;
+        
+        &::placeholder {
+            color: rgba(75, 74, 74, 0.62);
+            font-weight: 500;
+        }
+        
+        &:focus {
+            box-shadow: none;
+            border: none;
+            outline: none;
+        }
+    }
+}
