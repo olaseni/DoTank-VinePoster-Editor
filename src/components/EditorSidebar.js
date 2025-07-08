@@ -74,14 +74,48 @@ const EditorSidebar = ({ onPreviewClick, postId, currentSelectedBlock, blocks })
         return false;
     };
 
+    // Helper to check if a block is a container type that can accept new blocks
+    const isContainerBlock = (blockName) => {
+        const containerTypes = ['core/group', 'core/column', 'core/columns', 'core/stack', 'core/row'];
+        return containerTypes.includes(blockName);
+    };
+
+    // Get the selected block information
+    const getSelectedBlockInfo = () => {
+        if (!selectedBlockClientId) return null;
+        
+        const selectedBlock = findBlockByClientId(selectedBlockClientId, blocks);
+        return selectedBlock;
+    };
+
     // Check if blocks can be inserted in valid template containers only
     const isBlockTypeAllowed = (blockType) => {
-        if (!canInsertBlockType || !insertionPoint) {
+        if (!canInsertBlockType) {
             return false;
         }
         
-        // Prevent insertion at root level (outside template structure)
-        if (!insertionPoint.rootClientId) {
+        const selectedBlock = getSelectedBlockInfo();
+        
+        // If a container block is selected, check if we can append to it
+        if (selectedBlock && isContainerBlock(selectedBlock.name)) {
+            // Check if the container is within an editable area
+            if (isInEditableContainer(selectedBlock.clientId, blocks)) {
+                try {
+                    // Check if we can insert into the selected container
+                    const result = canInsertBlockType(
+                        blockType, 
+                        selectedBlock.clientId, 
+                        selectedBlock.innerBlocks?.length || 0
+                    );
+                    return result;
+                } catch (error) {
+                    return false;
+                }
+            }
+        }
+        
+        // Otherwise, use the normal insertion point logic
+        if (!insertionPoint || !insertionPoint.rootClientId) {
             return false;
         }
         
@@ -104,8 +138,8 @@ const EditorSidebar = ({ onPreviewClick, postId, currentSelectedBlock, blocks })
     };
 
     const handleInsertBlock = (blockType, attributes = {}) => {
-        if (!insertBlock || !insertionPoint) {
-            console.log('❌ insertBlock API or insertion point not available');
+        if (!insertBlock) {
+            console.log('❌ insertBlock API not available');
             return;
         }
         
@@ -131,13 +165,29 @@ const EditorSidebar = ({ onPreviewClick, postId, currentSelectedBlock, blocks })
                 newBlock = createBlock(blockType, attributes);
             }
             
-            // Use native WordPress insertion with proper insertion point
-            insertBlock(
-                newBlock,
-                insertionPoint.index,
-                insertionPoint.rootClientId
-            );
-            console.log(`✅ Successfully inserted ${blockType} at index ${insertionPoint.index} in container ${insertionPoint.rootClientId}`);
+            const selectedBlock = getSelectedBlockInfo();
+            
+            // If a container block is selected, append to it
+            if (selectedBlock && isContainerBlock(selectedBlock.name)) {
+                // Append to the selected container
+                const appendIndex = selectedBlock.innerBlocks?.length || 0;
+                insertBlock(
+                    newBlock,
+                    appendIndex,
+                    selectedBlock.clientId
+                );
+                console.log(`✅ Successfully appended ${blockType} to container ${selectedBlock.name} (${selectedBlock.clientId})`);
+            } else if (insertionPoint) {
+                // Use normal insertion point logic
+                insertBlock(
+                    newBlock,
+                    insertionPoint.index,
+                    insertionPoint.rootClientId
+                );
+                console.log(`✅ Successfully inserted ${blockType} at index ${insertionPoint.index} in container ${insertionPoint.rootClientId}`);
+            } else {
+                console.log('❌ No valid insertion point available');
+            }
         } catch (error) {
             console.log(`❌ Native insertion failed for ${blockType}:`, error.message);
         }
