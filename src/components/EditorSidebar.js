@@ -5,30 +5,28 @@ import FeaturedImage from './FeaturedImage';
 import Tags from './Tags';
 import BlockInserterButton from './BlockInserterButton';
 
-const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId, currentSelectedBlock, blocks }) => {
+const EditorSidebar = ({ onPreviewClick, postId, currentSelectedBlock, blocks }) => {
     
     // Feature flags
     const SHOW_FEATURED_IMAGE = false;
     const SHOW_TAGS = false;
     
-    // Get native WordPress block editor data and actions
+    // Get native WordPress block editor data with insertion context
     const {
+        canInsertBlockType,
         insertionPoint,
-        selectedBlockClientId,
-        availableInserterItems,
-        canInsertBlockType
+        selectedBlockClientId
     } = useSelect((select) => {
         const blockEditorSelect = select('core/block-editor');
         
         return {
+            canInsertBlockType: blockEditorSelect?.canInsertBlockType,
             insertionPoint: blockEditorSelect?.getBlockInsertionPoint?.() || null,
-            selectedBlockClientId: blockEditorSelect?.getSelectedBlockClientId?.() || null,
-            availableInserterItems: blockEditorSelect?.getInserterItems?.() || [],
-            canInsertBlockType: blockEditorSelect?.canInsertBlockType || null
+            selectedBlockClientId: blockEditorSelect?.getSelectedBlockClientId?.() || null
         };
     }, []);
     
-    const { insertBlock, insertBlocks } = useDispatch('core/block-editor');
+    const { insertBlock } = useDispatch('core/block-editor');
     
     // Helper function to find a block by clientId in the blocks tree
     const findBlockByClientId = (clientId, blocksArray) => {
@@ -58,33 +56,56 @@ const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId, currentSelectedB
         return null;
     };
 
-    // Check if a block type is allowed using native WordPress APIs only
-    const isBlockTypeAllowed = (blockType) => {
-        // Use native WordPress canInsertBlockType if available
-        if (canInsertBlockType) {
-            try {
-                return canInsertBlockType(blockType);
-            } catch (error) {
-                console.log('Native canInsertBlockType failed:', error.message);
-                return false;
+    // Helper to check if a block is within an editable template container
+    const isInEditableContainer = (clientId, blocksArray) => {
+        for (const block of blocksArray) {
+            if (block.clientId === clientId) {
+                // Check if this block has editable class names
+                const className = block.attributes?.className || '';
+                return className.includes('editable-description') || 
+                       className.includes('editable-main-content') ||
+                       className.includes('template-footer');
+            }
+            if (block.innerBlocks && block.innerBlocks.length > 0) {
+                const found = isInEditableContainer(clientId, block.innerBlocks);
+                if (found) return true;
             }
         }
-        
-        // Check if block type is in available inserter items (native Gutenberg logic)
-        if (availableInserterItems.length > 0) {
-            return availableInserterItems.some(item => item.name === blockType);
-        }
-        
-        // No native APIs available
         return false;
     };
 
-    const handleInsertBlock = (blockType, attributes = {}) => {
-        console.log(`🚀 Inserting block: ${blockType}`, { attributes, insertionPoint, selectedBlockClientId });
+    // Check if blocks can be inserted in valid template containers only
+    const isBlockTypeAllowed = (blockType) => {
+        if (!canInsertBlockType || !insertionPoint) {
+            return false;
+        }
         
-        // Use native WordPress insertion only
+        // Prevent insertion at root level (outside template structure)
+        if (!insertionPoint.rootClientId) {
+            return false;
+        }
+        
+        // Ensure we're inserting within an editable template container
+        if (!isInEditableContainer(insertionPoint.rootClientId, blocks)) {
+            return false;
+        }
+        
+        try {
+            // Check if insertion is allowed with specific context
+            const result = canInsertBlockType(
+                blockType, 
+                insertionPoint.rootClientId, 
+                insertionPoint.index
+            );
+            return result;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    const handleInsertBlock = (blockType, attributes = {}) => {
         if (!insertBlock || !insertionPoint) {
-            console.log('❌ Native WordPress insertion not available');
+            console.log('❌ insertBlock API or insertion point not available');
             return;
         }
         
@@ -111,8 +132,12 @@ const EditorSidebar = ({ onInsertBlock, onPreviewClick, postId, currentSelectedB
             }
             
             // Use native WordPress insertion with proper insertion point
-            insertBlock(newBlock, insertionPoint.index, insertionPoint.rootClientId);
-            console.log(`✅ Successfully inserted ${blockType} using native WordPress API`);
+            insertBlock(
+                newBlock,
+                insertionPoint.index,
+                insertionPoint.rootClientId
+            );
+            console.log(`✅ Successfully inserted ${blockType} at index ${insertionPoint.index} in container ${insertionPoint.rootClientId}`);
         } catch (error) {
             console.log(`❌ Native insertion failed for ${blockType}:`, error.message);
         }

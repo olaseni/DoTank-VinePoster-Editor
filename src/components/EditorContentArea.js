@@ -155,7 +155,6 @@ const EditorContentArea = ({
                     onSelectionChange={setCurrentSelectedBlock}
                 />
                 <EditorSidebar
-                    onInsertBlock={handleInsertBlock}
                     onPreviewClick={onPreviewClick}
                     postId={postId}
                     currentSelectedBlock={currentSelectedBlock}
