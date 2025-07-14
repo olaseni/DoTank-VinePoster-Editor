@@ -12,12 +12,19 @@ const EditorSidebar = ({ onPreviewClick, postId, currentSelectedBlock, blocks })
     // Settings state
     const [showSettings, setShowSettings] = useState(false);
     const [editorSettings, setEditorSettings] = useState({
+        // Author settings
+        authors: [
+            {
+                name: '',
+                bio: '',
+                avatarUrl: '',
+                email: '',
+                website: ''
+            }
+        ],
+        // Display settings
         showFeaturedImage: false,
-        showTags: false,
-        autoSave: false,
-        showBlockOutlines: false,
-        simplifiedToolbar: false,
-        focusMode: false
+        showTags: false
     });
     
     // Use settings to control feature flags
